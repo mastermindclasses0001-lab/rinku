@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setStoredToken(data.token);
     await refreshContext();
     setActiveSection(data.user.role === 'salesman' || data.user.role === 'cashier' ? 'pos' : 'dashboard');
-    notify('success', `Signed in as ${data.user.fullName}`);
+    notify('success', `Signed in as ${data.user.fullName} / लॉगिन सफल`);
   };
 
   const logout = () => {
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSuperTenantOverride(tenantId);
     setActiveBranchId('all');
     await refreshContext();
-    notify('info', 'Switched active tenant workspace');
+    notify('info', 'Switched active business workspace / बिजनेस बदला गया');
   };
 
   return (

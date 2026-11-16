@@ -39,7 +39,7 @@ export const PosModule: React.FC = () => {
   // Tile SqFt calculator helper
   const [calcSqft, setCalcSqft] = useState<number>(0);
   const [showNewCust, setShowNewCust] = useState(false);
-  const [newCust, setNewCust] = useState({ name: '', phone: '', segment: 'retail', stateCode: '27', gstin: '' });
+  const [newCust, setNewCust] = useState({ name: '', phone: '', segment: 'retail', stateCode: '20', gstin: '' });
 
   const sym = tenant?.currency_symbol || '₹';
 
@@ -195,31 +195,34 @@ export const PosModule: React.FC = () => {
               onClick={() => setView('terminal')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold ${view === 'terminal' ? 'bg-sky-500 text-slate-950' : 'text-slate-500'}`}
             >
-              POS Billing Terminal
+              POS Terminal / बिलिंग काउंटर
             </button>
             <button
               onClick={() => setView('history')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold ${view === 'history' ? 'bg-sky-500 text-slate-950' : 'text-slate-500'}`}
             >
-              Invoices & Credit Notes ({invoices.length})
+              Invoices & Returns / बिल व रिटर्न ({invoices.length})
             </button>
           </div>
-          <select
-            value={branchId}
-            onChange={(e) => setBranchId(e.target.value)}
-            className="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 text-xs font-medium"
-          >
-            {branches.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.name} ({b.state_code})
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] font-medium text-slate-400 whitespace-nowrap">Shop / दुकान:</span>
+            <select
+              value={branchId}
+              onChange={(e) => setBranchId(e.target.value)}
+              className="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 text-xs font-medium"
+            >
+              {branches.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name} ({b.state_code})
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs font-mono">
           <span className={isInterstate ? 'text-purple-400' : 'text-emerald-400'}>
-            {isInterstate ? 'INTERSTATE IGST MODE' : 'INTRASTATE CGST+SGST MODE'}
+            {isInterstate ? 'INTERSTATE IGST / बाहरी राज्य GST' : 'INTRASTATE CGST+SGST / राज्य GST'}
           </span>
         </div>
       </div>
@@ -235,18 +238,24 @@ export const PosModule: React.FC = () => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={handleBarcodeEnter}
-                  placeholder="Scan barcode or search SKU / product name (Enter to add)..."
+                  placeholder="Scan barcode or search SKU / प्रोडक्ट या बारकोड खोजें..."
                   className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 text-xs focus:outline-none focus:border-sky-500"
                 />
               </div>
-              <div className="flex items-center gap-1 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 p-1 rounded-lg">
-                {['All', 'Tiles', 'Paint', 'Sanitaryware', 'Hardware'].map((c) => (
+              <div className="flex items-center gap-1 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 p-1 rounded-lg overflow-x-auto">
+                {[
+                  { id: 'All', label: 'All / सभी' },
+                  { id: 'Tiles', label: 'Tiles / टाइल्स' },
+                  { id: 'Paint', label: 'Paint / पेंट' },
+                  { id: 'Sanitaryware', label: 'Sanitary / सैनिटरी' },
+                  { id: 'Hardware', label: 'Hardware / हार्डवेयर' },
+                ].map((c) => (
                   <button
-                    key={c}
-                    onClick={() => setCategory(c)}
-                    className={`px-2.5 py-1.5 rounded text-xs font-medium ${category === c ? 'bg-sky-500/15 text-sky-400' : 'text-slate-500'}`}
+                    key={c.id}
+                    onClick={() => setCategory(c.id)}
+                    className={`px-2.5 py-1.5 rounded text-xs font-medium whitespace-nowrap ${category === c.id ? 'bg-sky-500/15 text-sky-400' : 'text-slate-500'}`}
                   >
-                    {c}
+                    {c.label}
                   </button>
                 ))}
               </div>
@@ -256,18 +265,19 @@ export const PosModule: React.FC = () => {
             <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2 text-slate-400">
                 <Calculator className="w-4 h-4 text-sky-400" />
-                <span>Tile Area Helper: Enter Sq.Ft required to preview boxes needed</span>
+                <span>Tile Area Helper / टाइल्स बॉक्स कैलकुलेटर (Sq.Ft डालें)</span>
               </div>
               <div className="flex items-center gap-2">
+                <label className="text-[11px] text-slate-400">Area Sq.Ft / क्षेत्रफल:</label>
                 <input
                   type="number"
                   min={0}
                   value={calcSqft || ''}
                   onChange={(e) => setCalcSqft(Number(e.target.value))}
-                  placeholder="Sq. Ft (e.g. 450)"
+                  placeholder="e.g. 450"
                   className="w-28 px-2.5 py-1 rounded bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono"
                 />
-                {calcSqft > 0 && <span className="font-mono text-sky-400">Click any Tile card to add exact boxes</span>}
+                {calcSqft > 0 && <span className="font-mono text-sky-400">Click Tile card / टाइल चुनें</span>}
               </div>
             </div>
 
@@ -311,59 +321,76 @@ export const PosModule: React.FC = () => {
 
           {/* Right Cart & Payment Checkout */}
           <div className="lg:col-span-5 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-5 space-y-4 sticky top-20">
-            <div className="flex items-center justify-between">
-              <select
-                value={docType}
-                onChange={(e) => setDocType(e.target.value as any)}
-                className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 text-xs font-semibold"
-              >
-                <option value="invoice">Tax Invoice (GST)</option>
-                <option value="quotation">Quotation / Estimate</option>
-                <option value="challan">Delivery Challan</option>
-              </select>
-              <button onClick={() => setCart([])} className="text-xs text-red-400 hover:underline">
-                Clear Cart
+            <div className="flex items-end justify-between gap-2">
+              <div className="flex-1">
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Document Type / बिल प्रकार</label>
+                <select
+                  value={docType}
+                  onChange={(e) => setDocType(e.target.value as any)}
+                  className="w-full px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 text-xs font-semibold"
+                >
+                  <option value="invoice">Tax Invoice (GST) / जीएसटी बिल</option>
+                  <option value="quotation">Quotation / कोटेशन (अनुमान)</option>
+                  <option value="challan">Delivery Challan / चालान</option>
+                </select>
+              </div>
+              <button onClick={() => setCart([])} className="text-xs text-red-400 hover:underline pb-1.5">
+                Clear Cart / खाली करें
               </button>
             </div>
 
             {/* Customer & Salesman */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              <div className="flex gap-1">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Customer / ग्राहक</label>
+                <div className="flex gap-1">
+                  <select
+                    value={customerId}
+                    onChange={(e) => setCustomerId(e.target.value)}
+                    className="flex-1 px-2.5 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 truncate"
+                  >
+                    {customers.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.segment})
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewCust(true)}
+                    className="px-2.5 rounded-lg border border-white/10 hover:border-sky-500/40"
+                    title="Quick Register Customer / नया ग्राहक जोड़ें"
+                  >
+                    <UserPlus className="w-4 h-4 text-sky-400" />
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Salesman / सेल्समैन</label>
                 <select
-                  value={customerId}
-                  onChange={(e) => setCustomerId(e.target.value)}
-                  className="flex-1 px-2.5 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 truncate"
+                  value={salesmanId}
+                  onChange={(e) => setSalesmanId(e.target.value)}
+                  className="w-full px-2.5 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10"
                 >
-                  {customers.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name} ({c.segment})
+                  {employees.map((e) => (
+                    <option key={e.id} value={e.id}>
+                      Sales: {e.full_name}
                     </option>
                   ))}
                 </select>
-                <button
-                  type="button"
-                  onClick={() => setShowNewCust(true)}
-                  className="px-2.5 rounded-lg border border-white/10 hover:border-sky-500/40"
-                  title="Quick Register Customer"
-                >
-                  <UserPlus className="w-4 h-4 text-sky-400" />
-                </button>
               </div>
-              <select
-                value={salesmanId}
-                onChange={(e) => setSalesmanId(e.target.value)}
-                className="px-2.5 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10"
-              >
-                {employees.map((e) => (
-                  <option key={e.id} value={e.id}>
-                    Sales: {e.full_name}
-                  </option>
-                ))}
-              </select>
             </div>
 
             {/* Cart Lines */}
             <div className="max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-white/5 border-y border-slate-200 dark:border-white/10">
+              {cart.length > 0 && (
+                <div className="grid grid-cols-4 gap-1.5 py-1.5 text-[10px] font-medium text-slate-400">
+                  <span>Qty / मात्रा</span>
+                  <span>Rate ({sym}) / दर</span>
+                  <span>Disc % / छूट</span>
+                  <span>GST / टैक्स</span>
+                </div>
+              )}
               {cart.map((line, idx) => (
                 <div key={line.product.id} className="py-2.5 space-y-1.5 text-xs">
                   <div className="flex items-center justify-between gap-2">
@@ -386,7 +413,7 @@ export const PosModule: React.FC = () => {
                         setCart(next);
                       }}
                       className="px-2 py-1 rounded bg-slate-50 dark:bg-[#171C28] border border-white/10"
-                      title="Quantity"
+                      title="Quantity / मात्रा"
                     />
                     <input
                       type="number"
@@ -397,7 +424,7 @@ export const PosModule: React.FC = () => {
                         setCart(next);
                       }}
                       className="px-2 py-1 rounded bg-slate-50 dark:bg-[#171C28] border border-white/10"
-                      title="Rate"
+                      title="Rate / दर"
                     />
                     <input
                       type="number"
@@ -411,7 +438,7 @@ export const PosModule: React.FC = () => {
                       }}
                       placeholder="Disc%"
                       className="px-2 py-1 rounded bg-slate-50 dark:bg-[#171C28] border border-white/10"
-                      title="Line Discount %"
+                      title="Line Discount % / छूट %"
                     />
                     <button
                       type="button"
@@ -427,13 +454,13 @@ export const PosModule: React.FC = () => {
                   </div>
                 </div>
               ))}
-              {cart.length === 0 && <div className="py-8 text-center text-xs text-slate-500">Click products or scan barcode to start billing.</div>}
+              {cart.length === 0 && <div className="py-8 text-center text-xs text-slate-500">Click products or scan barcode to start billing. / बिल बनाने के लिए प्रोडक्ट चुनें।</div>}
             </div>
 
             {/* Totals Breakdown */}
             <div className="space-y-1.5 text-xs font-mono">
               <div className="flex justify-between text-slate-400">
-                <span>Taxable Amount</span>
+                <span>Taxable Amount / कर योग्य राशि</span>
                 <span>{sym}{finalTaxable.toFixed(2)}</span>
               </div>
               {isInterstate ? (
@@ -448,7 +475,7 @@ export const PosModule: React.FC = () => {
                 </div>
               )}
               <div className="flex items-center justify-between text-slate-400">
-                <span>Extra Discount ({sym})</span>
+                <span>Extra Discount / अतिरिक्त छूट ({sym})</span>
                 <input
                   type="number"
                   min={0}
@@ -458,7 +485,7 @@ export const PosModule: React.FC = () => {
                 />
               </div>
               <div className="flex justify-between text-base font-bold pt-2 border-t border-slate-200 dark:border-white/10">
-                <span>Grand Total</span>
+                <span>Grand Total / कुल राशि</span>
                 <span className="text-sky-400">{sym}{grandTotal.toLocaleString()}</span>
               </div>
             </div>
@@ -467,7 +494,7 @@ export const PosModule: React.FC = () => {
             {docType === 'invoice' && (
               <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-white/10 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold">Split Payment</span>
+                  <span className="font-semibold">Split Payment / भुगतान तरीका</span>
                   <button
                     type="button"
                     onClick={() => {
@@ -478,31 +505,34 @@ export const PosModule: React.FC = () => {
                     }}
                     className="text-sky-400 hover:underline font-mono"
                   >
-                    Full UPI ({sym}{grandTotal})
+                    Full UPI / पूरा UPI ({sym}{grandTotal})
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-2 font-mono">
                   <label className="flex items-center justify-between px-2.5 py-1.5 rounded bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                    <span className="text-slate-400">Cash</span>
+                    <span className="text-slate-400">Cash / नकद</span>
                     <input type="number" min={0} value={payCash || ''} onChange={(e) => setPayCash(Number(e.target.value))} className="w-20 text-right bg-transparent focus:outline-none" />
                   </label>
                   <label className="flex items-center justify-between px-2.5 py-1.5 rounded bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                    <span className="text-slate-400">UPI</span>
+                    <span className="text-slate-400">UPI / यूपीआई</span>
                     <input type="number" min={0} value={payUpi || ''} onChange={(e) => setPayUpi(Number(e.target.value))} className="w-20 text-right bg-transparent focus:outline-none" />
                   </label>
                   <label className="flex items-center justify-between px-2.5 py-1.5 rounded bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                    <span className="text-slate-400">Card</span>
+                    <span className="text-slate-400">Card / कार्ड</span>
                     <input type="number" min={0} value={payCard || ''} onChange={(e) => setPayCard(Number(e.target.value))} className="w-20 text-right bg-transparent focus:outline-none" />
                   </label>
                   <label className="flex items-center justify-between px-2.5 py-1.5 rounded bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                    <span className="text-slate-400">Bank</span>
+                    <span className="text-slate-400">Bank / बैंक</span>
                     <input type="number" min={0} value={payBank || ''} onChange={(e) => setPayBank(Number(e.target.value))} className="w-20 text-right bg-transparent focus:outline-none" />
                   </label>
                 </div>
                 {dueBalance > 0 && (
                   <div className="flex items-center justify-between text-amber-400 font-mono">
-                    <span>Credit Due: {sym}{dueBalance.toLocaleString()}</span>
-                    <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="px-2 py-1 rounded bg-slate-50 dark:bg-[#171C28] border border-white/10 text-xs" />
+                    <span>Credit Due / उधार बकाया: {sym}{dueBalance.toLocaleString()}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-slate-400">Due Date / तारीख:</span>
+                      <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="px-2 py-1 rounded bg-slate-50 dark:bg-[#171C28] border border-white/10 text-xs" />
+                    </div>
                   </div>
                 )}
               </div>
@@ -513,7 +543,7 @@ export const PosModule: React.FC = () => {
               onClick={handleSubmitBill}
               className="w-full py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-colors disabled:opacity-40"
             >
-              {submitting ? 'Processing...' : `Finalize ${docType.toUpperCase()} (${sym}${grandTotal.toLocaleString()})`}
+              {submitting ? 'Processing... / सेव हो रहा है...' : `Finalize ${docType.toUpperCase()} / बिल बनाएं (${sym}${grandTotal.toLocaleString()})`}
             </button>
           </div>
         </div>
@@ -524,15 +554,15 @@ export const PosModule: React.FC = () => {
             <table className="w-full text-xs">
               <thead className="bg-slate-50 dark:bg-[#171C28] border-b border-slate-200 dark:border-white/10 text-slate-500 text-left">
                 <tr>
-                  <th className="p-3">Invoice / Doc No</th>
-                  <th className="p-3">Customer</th>
-                  <th className="p-3">Branch</th>
-                  <th className="p-3 text-right">Taxable</th>
-                  <th className="p-3 text-right">GST</th>
-                  <th className="p-3 text-right">Total</th>
-                  <th className="p-3 text-right">Due</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-right">Actions</th>
+                  <th className="p-3">Invoice / बिल नं.</th>
+                  <th className="p-3">Customer / ग्राहक</th>
+                  <th className="p-3">Shop / दुकान</th>
+                  <th className="p-3 text-right">Taxable / मूल</th>
+                  <th className="p-3 text-right">GST / टैक्स</th>
+                  <th className="p-3 text-right">Total / कुल</th>
+                  <th className="p-3 text-right">Due / बकाया</th>
+                  <th className="p-3">Status / स्थिति</th>
+                  <th className="p-3 text-right">Actions / कार्य</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -589,7 +619,7 @@ export const PosModule: React.FC = () => {
                             className="px-2 py-1 rounded border border-red-500/30 text-red-400 hover:bg-red-500/10 inline-flex items-center gap-1"
                             title="Sales Return / Cancel Bill"
                           >
-                            <RotateCcw className="w-3.5 h-3.5" /> Return
+                            <RotateCcw className="w-3.5 h-3.5" /> Return / वापसी
                           </button>
                         )}
                       </div>
@@ -619,22 +649,37 @@ export const PosModule: React.FC = () => {
             }}
             className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-sm w-full p-5 space-y-3 text-xs"
           >
-            <h3 className="font-display font-bold text-base">Quick Customer Registration</h3>
-            <input required placeholder="Full Name *" value={newCust.name} onChange={(e) => setNewCust({ ...newCust, name: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-            <input required placeholder="WhatsApp Mobile *" value={newCust.phone} onChange={(e) => setNewCust({ ...newCust, phone: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-            <div className="grid grid-cols-2 gap-2">
-              <select value={newCust.segment} onChange={(e) => setNewCust({ ...newCust, segment: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                <option value="retail">Retail</option>
-                <option value="contractor">Contractor</option>
-                <option value="builder">Builder</option>
-                <option value="architect">Architect</option>
-              </select>
-              <input placeholder="State Code (27)" value={newCust.stateCode} onChange={(e) => setNewCust({ ...newCust, stateCode: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+            <h3 className="font-display font-bold text-base">Quick Customer / नया ग्राहक जोड़ें</h3>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Full Name / पूरा नाम *</label>
+              <input required placeholder="Customer Name" value={newCust.name} onChange={(e) => setNewCust({ ...newCust, name: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
             </div>
-            <input placeholder="Customer GSTIN (Optional)" value={newCust.gstin} onChange={(e) => setNewCust({ ...newCust, gstin: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">WhatsApp Mobile / मोबाइल नं. *</label>
+              <input required placeholder="+91 98..." value={newCust.phone} onChange={(e) => setNewCust({ ...newCust, phone: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Customer Type / श्रेणी</label>
+                <select value={newCust.segment} onChange={(e) => setNewCust({ ...newCust, segment: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  <option value="retail">Retail / रिटेल</option>
+                  <option value="contractor">Contractor / ठेकेदार</option>
+                  <option value="builder">Builder / बिल्डर</option>
+                  <option value="architect">Architect / आर्किटेक्ट</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">GST State Code / राज्य कोड</label>
+                <input placeholder="20 (Jharkhand)" value={newCust.stateCode} onChange={(e) => setNewCust({ ...newCust, stateCode: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Customer GSTIN / ग्राहक GSTIN (Optional)</label>
+              <input placeholder="20XXXXX..." value={newCust.gstin} onChange={(e) => setNewCust({ ...newCust, gstin: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+            </div>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowNewCust(false)} className="px-3 py-2 rounded-lg border border-white/10">Cancel</button>
-              <button type="submit" className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Save Customer</button>
+              <button type="button" onClick={() => setShowNewCust(false)} className="px-3 py-2 rounded-lg border border-white/10">Cancel / रद्द</button>
+              <button type="submit" className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Save / सेव करें</button>
             </div>
           </form>
         </div>

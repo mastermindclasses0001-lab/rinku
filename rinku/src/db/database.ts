@@ -437,6 +437,33 @@ export function initDatabase() {
   if (tenantCount === 0) {
     seedInitialDemoData();
   }
+
+  db.exec(`
+    UPDATE branches SET name = 'Rinku 1', code = 'BR-RNC', address = 'Ratu Road, Near Galaxia Mall, Ranchi', city = 'Ranchi', state = 'Jharkhand', state_code = '20', gstin = '20AABCR4821F1Z5', phone = '+91 651 228 1100', lat = 23.3690, lng = 85.3110 WHERE id = 'br_vg_south' AND (name = 'South Flagship Showroom' OR city = 'Mumbai');
+    UPDATE branches SET name = 'Rinku 2', code = 'BR-DHN', address = 'Bank More, Shastri Nagar, Dhanbad', city = 'Dhanbad', state = 'Jharkhand', state_code = '20', gstin = '20AABCR4821F1Z5', phone = '+91 326 230 4420', lat = 23.7957, lng = 86.4304 WHERE id = 'br_vg_west' AND (name = 'West Industrial Depot' OR city = 'Navi Mumbai');
+    UPDATE branches SET name = 'Rinku 3', code = 'BR-JSR', address = 'Bistupur Main Road, Jamshedpur', city = 'Jamshedpur', state = 'Jharkhand', state_code = '20', gstin = '20AABCR4821F1Z5', phone = '+91 657 242 9900', lat = 22.8046, lng = 86.2029 WHERE id = 'br_vg_east' AND (name = 'East Express Hub' OR city = 'Surat');
+    UPDATE tenants SET name = 'Jharkhand Tiles & Hardware', legal_name = 'Rinku Building Materials Jharkhand Pvt. Ltd.', gstin = '20AABCR4821F1Z5', address = 'Main Road, Hinoo Chowk, Ranchi, Jharkhand 834002', phone = '+91 651 225 4410' WHERE id = 'ten_vanguard' AND (name = 'Vanguard Ceramics & Hardware' OR address LIKE '%Mumbai%');
+    UPDATE users SET full_name = 'Ramesh Oraon (Platform Admin)', address = 'Ranchi HQ, Jharkhand' WHERE id = 'usr_super' AND full_name LIKE 'Arjun Mehta%';
+    UPDATE users SET full_name = 'Rinku Mahato', address = 'Hinoo, Ranchi, Jharkhand' WHERE id = 'usr_vg_owner' AND full_name = 'Vikramaditya Rao';
+    UPDATE users SET full_name = 'Priya Kumari', address = 'Lalpur, Ranchi, Jharkhand' WHERE id = 'usr_vg_mgr1' AND full_name = 'Priya Nair';
+    UPDATE users SET full_name = 'Amit Soren', address = 'Doranda, Ranchi, Jharkhand' WHERE id = 'usr_vg_sales1' AND full_name = 'Rohan Kulkarni';
+    UPDATE users SET full_name = 'Suresh Munda', address = 'Hirapur, Dhanbad, Jharkhand' WHERE id = 'usr_vg_sales2' AND full_name = 'Suresh Patil';
+    UPDATE users SET full_name = 'Neha Verma', address = 'Sakchi, Jamshedpur, Jharkhand' WHERE id = 'usr_vg_acc' AND full_name = 'Neha Desai';
+    UPDATE suppliers SET name = 'Kajaria Ceramics Depot (Ranchi)', gstin = '20AAACK4410D1Z9', phone = '+91 651 400 9900', address = 'Namkum Industrial Area, Ranchi, Jharkhand' WHERE id = 'sup_kajaria' AND address LIKE '%Thane%';
+    UPDATE suppliers SET name = 'Asian Paints Jharkhand Hub', gstin = '20AAACA8821M1Z1', phone = '+91 657 621 8100', address = 'Adityapur Industrial Area, Jamshedpur, Jharkhand' WHERE id = 'sup_asian' AND address LIKE '%Navi Mumbai%';
+    UPDATE suppliers SET name = 'Kohler & Dorset Supply (Bokaro)', gstin = '20AAACK7712N1Z4', phone = '+91 6542 240 321', address = 'Chas Industrial Estate, Bokaro, Jharkhand' WHERE id = 'sup_kohler' AND address LIKE '%Gujarat%';
+    UPDATE customers SET name = 'Chotanagpur Infra & Builders Pvt. Ltd.', address = 'Kanke Road, Ranchi, Jharkhand', state_code = '20', gstin = '20AABCC8821H1Z3' WHERE id = 'cust_1' AND address LIKE '%Mumbai%';
+    UPDATE customers SET name = 'Birsa Architectural Studio', address = 'Harmu Housing Colony, Ranchi, Jharkhand', state_code = '20', gstin = '20AAAFB2219L1Z8' WHERE id = 'cust_2' AND address LIKE '%Bandra%';
+    UPDATE customers SET name = 'Mahto Interior Contractors', address = 'Saraidhela, Dhanbad, Jharkhand', state_code = '20' WHERE id = 'cust_3' AND address LIKE '%Navi Mumbai%';
+    UPDATE customers SET name = 'Singhania Developers (Bokaro)', address = 'Sector 4 City Centre, Bokaro, Jharkhand', state_code = '20', gstin = '20AAACS1109F1Z1' WHERE id = 'cust_4' AND address LIKE '%Surat%';
+    UPDATE customers SET address = 'Counter Cash Sale, Ranchi', state_code = '20' WHERE id = 'cust_5' AND state_code = '27';
+    UPDATE expenses SET vendor_name = 'Jharkhand Maa Kali Transport' WHERE id = 'exp_1' AND vendor_name = 'Shree Ganesh Transport';
+    UPDATE expenses SET vendor_name = 'JBVNL Electricity Ranchi' WHERE id = 'exp_2' AND vendor_name = 'Adani Electricity Mumbai';
+    UPDATE expenses SET vendor_name = 'Dhanbad Industrial Services' WHERE id = 'exp_3' AND vendor_name = 'Omega Industrial Services';
+    UPDATE ai_knowledge SET content = 'Jharkhand Tiles & Hardware operates 3 shops: Rinku 1 (Ratu Road, Ranchi), Rinku 2 (Bank More, Dhanbad), and Rinku 3 (Bistupur, Jamshedpur) in Jharkhand. Open Mon-Sun 9:30 AM to 8:30 PM.' WHERE id = 'kb_1' AND (content LIKE '%Mumbai%' OR content LIKE '%South Flagship Showroom%');
+    UPDATE whatsapp_logs SET message_body = 'Hi, do you have 40 boxes of Statuario Imperiale 600x1200mm in the same batch lot at Rinku 1 Ranchi showroom?' WHERE id = 'wa_2' AND message_body LIKE '%Bandra%';
+    UPDATE customer_complaints SET description = 'Reported 2 chipped tiles upon site delivery at Saraidhela, Dhanbad.' WHERE id = 'cmp_1' AND description LIKE '%Vashi%';
+  `);
 }
 
 function seedInitialDemoData() {
@@ -452,20 +479,20 @@ function seedInitialDemoData() {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       'ten_vanguard',
-      'vanguard-ceramics',
-      'Vanguard Ceramics & Hardware',
-      'Vanguard Building Materials Pvt. Ltd.',
-      '27AABCV4821F1Z5',
-      'Plot 42, Marol Industrial Estate, Andheri East, Mumbai 400059',
-      '+91 22 4890 2210',
-      'billing@vanguardceramics.demo',
+      'jharkhand-tiles-rinku',
+      'Jharkhand Tiles & Hardware',
+      'Rinku Building Materials Jharkhand Pvt. Ltd.',
+      '20AABCR4821F1Z5',
+      'Main Road, Hinoo Chowk, Ranchi, Jharkhand 834002',
+      '+91 651 225 4410',
+      'billing@rinkutraders.demo',
       'INR',
       '₹',
       'enterprise',
       'active',
       1,
-      JSON.stringify({ accent: '#38BDF8', invoiceFooter: 'Thank you for building with Vanguard Ceramics & Hardware. Goods once sold are subject to batch verification.', financialYear: '2026-27', language: 'en-IN' }),
-      JSON.stringify({ reminderTime: '09:00', allowNegativeStock: false, maxCashierDiscountPct: 10, stateCode: '27' })
+      JSON.stringify({ accent: '#38BDF8', invoiceFooter: 'Thank you for shopping with Jharkhand Tiles & Hardware (Rinku 1, Rinku 2, Rinku 3). Goods once sold are subject to batch verification.', financialYear: '2026-27', language: 'en-IN' }),
+      JSON.stringify({ reminderTime: '09:00', allowNegativeStock: false, maxCashierDiscountPct: 10, stateCode: '20' })
     );
 
     db.prepare(`
@@ -473,31 +500,31 @@ function seedInitialDemoData() {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       'ten_apex',
-      'apex-sanitary',
-      'Apex Sanitary & Paints',
-      'Apex Bathware & Coatings LLP',
-      '29AAECA9102K1Z8',
-      '100 Feet Road, Indiranagar, Bengaluru 560038',
-      '+91 80 4120 7788',
+      'apex-sanitary-jamshedpur',
+      'Apex Sanitary & Paints (Bokaro)',
+      'Apex Bathware & Coatings Jharkhand LLP',
+      '20AAECA9102K1Z8',
+      'Sector 4 City Centre, Bokaro Steel City, Jharkhand 827004',
+      '+91 6542 240 778',
       'accounts@apexsanitary.demo',
       'INR',
       '₹',
       'pro',
       'active',
       1,
-      JSON.stringify({ accent: '#22C55E', invoiceFooter: 'Apex Sanitary & Paints — Authorized Bathware & Coatings Studio.', financialYear: '2026-27', language: 'en-IN' }),
-      JSON.stringify({ reminderTime: '09:00', allowNegativeStock: false, maxCashierDiscountPct: 8, stateCode: '29' })
+      JSON.stringify({ accent: '#22C55E', invoiceFooter: 'Apex Sanitary & Paints (Bokaro, Jharkhand) — Authorized Bathware & Coatings Studio.', financialYear: '2026-27', language: 'en-IN' }),
+      JSON.stringify({ reminderTime: '09:00', allowNegativeStock: false, maxCashierDiscountPct: 8, stateCode: '20' })
     );
 
-    // 2. Branches (3 for Vanguard, 1 for Apex)
+    // 2. Branches (3 for Jharkhand Rinku Shops, 1 for Apex)
     const insertBranch = db.prepare(`
       INSERT INTO branches (id, tenant_id, code, name, address, city, state, state_code, gstin, phone, lat, lng, radius_meters, is_headquarters)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    insertBranch.run('br_vg_south', 'ten_vanguard', 'BR-STH', 'South Flagship Showroom', '42 Linking Road, Bandra West', 'Mumbai', 'Maharashtra', '27', '27AABCV4821F1Z5', '+91 22 2640 1100', 19.0607, 72.8362, 300, 1);
-    insertBranch.run('br_vg_west', 'ten_vanguard', 'BR-WST', 'West Industrial Depot', 'MIDC Phase II, Thane Belapur Rd', 'Navi Mumbai', 'Maharashtra', '27', '27AABCV4821F1Z5', '+91 22 2768 4420', 19.1136, 73.0125, 400, 0);
-    insertBranch.run('br_vg_east', 'ten_vanguard', 'BR-EST', 'East Express Hub', 'Ring Road Ceramic Arcade, Surat', 'Surat', 'Gujarat', '24', '24AABCV4821F1Z2', '+91 261 234 9900', 21.1702, 72.8311, 350, 0);
-    insertBranch.run('br_ax_blr', 'ten_apex', 'AX-BLR', 'Indiranagar Studio', '100 Feet Road, Indiranagar', 'Bengaluru', 'Karnataka', '29', '29AAECA9102K1Z8', '+91 80 4120 7788', 12.9784, 77.6408, 300, 1);
+    insertBranch.run('br_vg_south', 'ten_vanguard', 'BR-RNC', 'Rinku 1', 'Ratu Road, Near Galaxia Mall, Ranchi', 'Ranchi', 'Jharkhand', '20', '20AABCR4821F1Z5', '+91 651 228 1100', 23.369, 85.311, 300, 1);
+    insertBranch.run('br_vg_west', 'ten_vanguard', 'BR-DHN', 'Rinku 2', 'Bank More, Shastri Nagar, Dhanbad', 'Dhanbad', 'Jharkhand', '20', '20AABCR4821F1Z5', '+91 326 230 4420', 23.7957, 86.4304, 400, 0);
+    insertBranch.run('br_vg_east', 'ten_vanguard', 'BR-JSR', 'Rinku 3', 'Bistupur Main Road, Jamshedpur', 'Jamshedpur', 'Jharkhand', '20', '20AABCR4821F1Z5', '+91 657 242 9900', 22.8046, 86.2029, 350, 0);
+    insertBranch.run('br_ax_blr', 'ten_apex', 'AX-BKR', 'Bokaro Studio', 'Sector 4 City Centre, Bokaro', 'Bokaro', 'Jharkhand', '20', '20AAECA9102K1Z8', '+91 6542 240 778', 23.6693, 86.1511, 300, 1);
 
     // 3. Users (Super Admin, Owners, Branch Managers, Cashiers, Salesmen)
     const insertUser = db.prepare(`
@@ -505,13 +532,13 @@ function seedInitialDemoData() {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     const sampleVector = Array.from({ length: 32 }, (_, i) => Number((Math.sin(i + 1) * 0.5 + 0.5).toFixed(4)));
-    insertUser.run('usr_super', 'ten_vanguard', null, 'superadmin@titangrid.erp', hashPassword('Admin@123'), 'Arjun Mehta (Platform Admin)', 'super_admin', '9999', '+91 98200 00001', 'Mumbai HQ', 0, '2024-01-01', 0, 0, 0, 0, null);
-    insertUser.run('usr_vg_owner', 'ten_vanguard', 'br_vg_south', 'owner@vanguard.demo', hashPassword('Owner@123'), 'Vikramaditya Rao', 'owner', '1111', '+91 98201 11223', 'Bandra West, Mumbai', 120000, '2024-02-01', 1500000, 0, 1, 1, encryptJson({ vec: sampleVector }));
-    insertUser.run('usr_vg_mgr1', 'ten_vanguard', 'br_vg_south', 'manager@vanguard.demo', hashPassword('Manager@123'), 'Priya Nair', 'branch_manager', '2244', '+91 98202 33445', 'Andheri West, Mumbai', 48000, '2024-04-10', 800000, 1.5, 1, 1, encryptJson({ vec: sampleVector }));
-    insertUser.run('usr_vg_sales1', 'ten_vanguard', 'br_vg_south', 'sales@vanguard.demo', hashPassword('Sales@123'), 'Rohan Kulkarni', 'salesman', '4821', '+91 98203 55667', 'Dadar East, Mumbai', 26000, '2025-01-15', 450000, 2.0, 1, 1, encryptJson({ vec: sampleVector }));
-    insertUser.run('usr_vg_sales2', 'ten_vanguard', 'br_vg_west', 'west.sales@vanguard.demo', hashPassword('Sales@123'), 'Suresh Patil', 'salesman', '3319', '+91 98204 77889', 'Vashi, Navi Mumbai', 24000, '2025-03-01', 400000, 2.0, 0, 0, null);
-    insertUser.run('usr_vg_acc', 'ten_vanguard', 'br_vg_east', 'accounts@vanguard.demo', hashPassword('Account@123'), 'Neha Desai', 'accountant', '5501', '+91 98250 12345', 'Adajan, Surat', 38000, '2024-08-01', 250000, 0.5, 1, 1, encryptJson({ vec: sampleVector }));
-    insertUser.run('usr_ax_owner', 'ten_apex', 'br_ax_blr', 'owner@apex.demo', hashPassword('Apex@123'), 'Karthik Gowda', 'owner', '7788', '+91 98450 99001', 'Indiranagar, Bengaluru', 95000, '2024-06-01', 900000, 0, 1, 1, encryptJson({ vec: sampleVector }));
+    insertUser.run('usr_super', 'ten_vanguard', null, 'superadmin@titangrid.erp', hashPassword('Admin@123'), 'Ramesh Oraon (Platform Admin)', 'super_admin', '9999', '+91 98351 00001', 'Ranchi HQ, Jharkhand', 0, '2024-01-01', 0, 0, 0, 0, null);
+    insertUser.run('usr_vg_owner', 'ten_vanguard', 'br_vg_south', 'owner@vanguard.demo', hashPassword('Owner@123'), 'Rinku Mahato', 'owner', '1111', '+91 98351 11223', 'Hinoo, Ranchi, Jharkhand', 120000, '2024-02-01', 1500000, 0, 1, 1, encryptJson({ vec: sampleVector }));
+    insertUser.run('usr_vg_mgr1', 'ten_vanguard', 'br_vg_south', 'manager@vanguard.demo', hashPassword('Manager@123'), 'Priya Kumari', 'branch_manager', '2244', '+91 98352 33445', 'Lalpur, Ranchi, Jharkhand', 48000, '2024-04-10', 800000, 1.5, 1, 1, encryptJson({ vec: sampleVector }));
+    insertUser.run('usr_vg_sales1', 'ten_vanguard', 'br_vg_south', 'sales@vanguard.demo', hashPassword('Sales@123'), 'Amit Soren', 'salesman', '4821', '+91 98353 55667', 'Doranda, Ranchi, Jharkhand', 26000, '2025-01-15', 450000, 2.0, 1, 1, encryptJson({ vec: sampleVector }));
+    insertUser.run('usr_vg_sales2', 'ten_vanguard', 'br_vg_west', 'west.sales@vanguard.demo', hashPassword('Sales@123'), 'Suresh Munda', 'salesman', '3319', '+91 98354 77889', 'Hirapur, Dhanbad, Jharkhand', 24000, '2025-03-01', 400000, 2.0, 0, 0, null);
+    insertUser.run('usr_vg_acc', 'ten_vanguard', 'br_vg_east', 'accounts@vanguard.demo', hashPassword('Account@123'), 'Neha Verma', 'accountant', '5501', '+91 98355 12345', 'Sakchi, Jamshedpur, Jharkhand', 38000, '2024-08-01', 250000, 0.5, 1, 1, encryptJson({ vec: sampleVector }));
+    insertUser.run('usr_ax_owner', 'ten_apex', 'br_ax_blr', 'owner@apex.demo', hashPassword('Apex@123'), 'Sanjay Barnwal', 'owner', '7788', '+91 94311 99001', 'Sector 4, Bokaro, Jharkhand', 95000, '2024-06-01', 900000, 0, 1, 1, encryptJson({ vec: sampleVector }));
 
     // 4. Categories
     const insertCat = db.prepare(`INSERT INTO categories (id, tenant_id, name, slug) VALUES (?, ?, ?, ?)`);
@@ -587,13 +614,13 @@ function seedInitialDemoData() {
 
     // 7. Suppliers & Purchase Orders
     db.prepare(`INSERT INTO suppliers (id, tenant_id, name, gstin, phone, email, address, balance_payable) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      'sup_kajaria', 'ten_vanguard', 'Kajaria Ceramics Ltd. (West Zone)', '27AAACK4410D1Z9', '+91 22 4001 9900', 'dispatch@kajariaceramics.demo', 'Bhiwandi Logistics Park, Thane', 145000
+      'sup_kajaria', 'ten_vanguard', 'Kajaria Ceramics Depot (Ranchi)', '20AAACK4410D1Z9', '+91 651 400 9900', 'dispatch@kajariaceramics.demo', 'Namkum Industrial Area, Ranchi, Jharkhand', 145000
     );
     db.prepare(`INSERT INTO suppliers (id, tenant_id, name, gstin, phone, email, address, balance_payable) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      'sup_asian', 'ten_vanguard', 'Asian Paints Distribution Hub', '27AAACA8821M1Z1', '+91 22 6218 1000', 'orders@asianpaints.demo', 'Taloja MIDC, Navi Mumbai', 82500
+      'sup_asian', 'ten_vanguard', 'Asian Paints Jharkhand Hub', '20AAACA8821M1Z1', '+91 657 621 8100', 'orders@asianpaints.demo', 'Adityapur Industrial Area, Jamshedpur, Jharkhand', 82500
     );
     db.prepare(`INSERT INTO suppliers (id, tenant_id, name, gstin, phone, email, address, balance_payable) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      'sup_kohler', 'ten_vanguard', 'Kohler & Dorset Architectural Supply', '24AAACK7712N1Z4', '+91 261 400 3210', 'supply@kohlerdist.demo', 'GIDC Ankleshwar, Gujarat', 64000
+      'sup_kohler', 'ten_vanguard', 'Kohler & Dorset Supply (Bokaro)', '20AAACK7712N1Z4', '+91 6542 240 321', 'supply@kohlerdist.demo', 'Chas Industrial Estate, Bokaro, Jharkhand', 64000
     );
 
     db.prepare(`INSERT INTO purchase_orders (id, tenant_id, branch_id, supplier_id, po_no, status, subtotal, gst_amount, total_amount, paid_amount, notes, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
@@ -608,12 +635,12 @@ function seedInitialDemoData() {
       INSERT INTO customers (id, tenant_id, branch_id, name, phone, email, address, state_code, gstin, segment, credit_limit, outstanding_balance, whatsapp_opt_in, due_date, notes)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    insertCust.run('cust_1', 'ten_vanguard', 'br_vg_south', 'Oberoi Skyline Infra Pvt. Ltd.', '+91 98210 45001', 'procurement@oberoiinfra.demo', 'Worli Sea Face, Mumbai', '27', '27AABCO8821H1Z3', 'builder', 500000, 118400, 1, yesterday, 'Priority builder account — 30 day credit');
-    insertCust.run('cust_2', 'ten_vanguard', 'br_vg_south', 'Studio Forma Architects', '+91 98211 78900', 'studio@formaarch.demo', 'Pali Hill, Bandra West', '27', '27AAAFS2219L1Z8', 'architect', 250000, 42500, 1, nextWeek, 'Prefers matte brass & Statuario slabs');
-    insertCust.run('cust_3', 'ten_vanguard', 'br_vg_west', 'Maheshwar Interior Contractors', '+91 98192 33410', 'mahesh.int@demo.in', 'Sector 17, Vashi, Navi Mumbai', '27', null, 'contractor', 150000, 28600, 1, twoDaysAgo, 'Overdue reminder candidate');
-    insertCust.run('cust_4', 'ten_vanguard', 'br_vg_east', 'Patel Ceramic & Developers', '+91 98251 66712', 'pateldev@surat.demo', 'Vesu Canal Road, Surat', '24', '24AAACP1109F1Z1', 'builder', 400000, 0, 1, null, 'Interstate & Gujarat hub client');
-    insertCust.run('cust_5', 'ten_vanguard', 'br_vg_south', 'Walk-in Retail Customer', '+91 90000 00000', null, 'Counter Cash Sale', '27', null, 'retail', 0, 0, 0, null, 'Default retail counter profile');
-    insertCust.run('cust_ax_1', 'ten_apex', 'br_ax_blr', 'Prestige Crest Interiors', '+91 98451 11223', 'orders@prestigecrest.demo', 'Koramangala, Bengaluru', '29', '29AAACP5541M1Z2', 'architect', 300000, 32000, 1, nextWeek, 'Apex tenant isolated customer');
+    insertCust.run('cust_1', 'ten_vanguard', 'br_vg_south', 'Chotanagpur Infra & Builders Pvt. Ltd.', '+91 94311 45001', 'procurement@chotanagpurinfra.demo', 'Kanke Road, Ranchi, Jharkhand', '20', '20AABCC8821H1Z3', 'builder', 500000, 118400, 1, yesterday, 'Priority builder account — 30 day credit');
+    insertCust.run('cust_2', 'ten_vanguard', 'br_vg_south', 'Birsa Architectural Studio', '+91 94312 78900', 'studio@birsaarch.demo', 'Harmu Housing Colony, Ranchi, Jharkhand', '20', '20AAAFB2219L1Z8', 'architect', 250000, 42500, 1, nextWeek, 'Prefers matte brass & Statuario slabs');
+    insertCust.run('cust_3', 'ten_vanguard', 'br_vg_west', 'Mahto Interior Contractors', '+91 94313 33410', 'mahto.int@demo.in', 'Saraidhela, Dhanbad, Jharkhand', '20', null, 'contractor', 150000, 28600, 1, twoDaysAgo, 'Overdue reminder candidate');
+    insertCust.run('cust_4', 'ten_vanguard', 'br_vg_east', 'Singhania Developers (Bokaro)', '+91 94314 66712', 'singhaniadev@bokaro.demo', 'Sector 4 City Centre, Bokaro, Jharkhand', '20', '20AAACS1109F1Z1', 'builder', 400000, 0, 1, null, 'Bokaro & Jamshedpur hub client');
+    insertCust.run('cust_5', 'ten_vanguard', 'br_vg_south', 'Walk-in Retail Customer', '+91 90000 00000', null, 'Counter Cash Sale, Ranchi', '20', null, 'retail', 0, 0, 0, null, 'Default retail counter profile');
+    insertCust.run('cust_ax_1', 'ten_apex', 'br_ax_blr', 'Damodar Crest Interiors', '+91 94315 11223', 'orders@damodarcrest.demo', 'Chas, Bokaro, Jharkhand', '20', '20AAACD5541M1Z2', 'architect', 300000, 32000, 1, nextWeek, 'Apex tenant isolated customer');
 
     // 9. Invoices + Items (with exact GST CGST/SGST/IGST & purchase_cost for true P&L)
     const insertInv = db.prepare(`
@@ -653,11 +680,11 @@ function seedInitialDemoData() {
     insertPay.run('pay_3', 'ten_vanguard', 'br_vg_west', 'customer', 'cust_3', 'inv_3', 47510, 'cash', 'CASH-WST-412', 'verified', 'Partial cash counter receipt', 'usr_vg_sales2', `${yesterday}T16:15:00`);
 
     const insertExp = db.prepare(`INSERT INTO expenses (id, tenant_id, branch_id, category, description, amount, payment_mode, vendor_name, expense_date, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-    insertExp.run('exp_1', 'ten_vanguard', 'br_vg_south', 'Logistics & Freight', 'Tempo unloading & ceramic crate handling', 3850, 'cash', 'Shree Ganesh Transport', today, 'usr_vg_mgr1');
-    insertExp.run('exp_2', 'ten_vanguard', 'br_vg_south', 'Showroom Utilities', 'Showroom HVAC & display lighting electricity', 14200, 'upi', 'Adani Electricity Mumbai', yesterday, 'usr_vg_owner');
-    insertExp.run('exp_3', 'ten_vanguard', 'br_vg_west', 'Warehouse Maintenance', 'Forklift hydraulic servicing', 6400, 'bank_transfer', 'Omega Industrial Services', twoDaysAgo, 'usr_vg_sales2');
+    insertExp.run('exp_1', 'ten_vanguard', 'br_vg_south', 'Logistics & Freight', 'Tempo unloading & ceramic crate handling', 3850, 'cash', 'Jharkhand Maa Kali Transport', today, 'usr_vg_mgr1');
+    insertExp.run('exp_2', 'ten_vanguard', 'br_vg_south', 'Showroom Utilities', 'Showroom HVAC & display lighting electricity', 14200, 'upi', 'JBVNL Electricity Ranchi', yesterday, 'usr_vg_owner');
+    insertExp.run('exp_3', 'ten_vanguard', 'br_vg_west', 'Warehouse Maintenance', 'Forklift hydraulic servicing', 6400, 'bank_transfer', 'Dhanbad Industrial Services', twoDaysAgo, 'usr_vg_sales2');
 
-    // 11. Stock Transfer (West Depot -> South Showroom)
+    // 11. Stock Transfer (Rinku 2 Dhanbad -> Rinku 1 Ranchi)
     db.prepare(`INSERT INTO stock_transfers (id, tenant_id, transfer_no, from_branch_id, to_branch_id, status, notes, dispatched_by, dispatched_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
       'trf_1', 'ten_vanguard', 'TRF-2026-0019', 'br_vg_west', 'br_vg_south', 'dispatched', 'Urgent replenishment for Nero Marquina Matte 800x800mm', 'usr_vg_sales2', `${today}T09:15:00`
     );
@@ -667,28 +694,28 @@ function seedInitialDemoData() {
 
     // 12. Attendance Logs
     const insertAtt = db.prepare(`INSERT INTO attendance_logs (id, tenant_id, branch_id, user_id, log_date, check_in_time, check_out_time, method, liveness_score, face_match_score, lat, lng, geofence_ok, status, overtime_mins) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-    insertAtt.run('att_1', 'ten_vanguard', 'br_vg_south', 'usr_vg_mgr1', today, '09:04', null, 'face_liveness', 0.98, 0.94, 19.0608, 72.8361, 1, 'present', 0);
-    insertAtt.run('att_2', 'ten_vanguard', 'br_vg_south', 'usr_vg_sales1', today, '09:22', null, 'face_liveness', 0.96, 0.91, 19.0609, 72.8364, 1, 'late', 0);
-    insertAtt.run('att_3', 'ten_vanguard', 'br_vg_south', 'usr_vg_sales1', yesterday, '09:00', '19:45', 'face_liveness', 0.97, 0.93, 19.0607, 72.8362, 1, 'present', 45);
-    insertAtt.run('att_4', 'ten_vanguard', 'br_vg_east', 'usr_vg_acc', today, '09:02', null, 'pin_fallback', 0, 0, 21.1702, 72.8312, 1, 'present', 0);
+    insertAtt.run('att_1', 'ten_vanguard', 'br_vg_south', 'usr_vg_mgr1', today, '09:04', null, 'face_liveness', 0.98, 0.94, 23.3691, 85.3111, 1, 'present', 0);
+    insertAtt.run('att_2', 'ten_vanguard', 'br_vg_south', 'usr_vg_sales1', today, '09:22', null, 'face_liveness', 0.96, 0.91, 23.3692, 85.3112, 1, 'late', 0);
+    insertAtt.run('att_3', 'ten_vanguard', 'br_vg_south', 'usr_vg_sales1', yesterday, '09:00', '19:45', 'face_liveness', 0.97, 0.93, 23.369, 85.311, 1, 'present', 45);
+    insertAtt.run('att_4', 'ten_vanguard', 'br_vg_east', 'usr_vg_acc', today, '09:02', null, 'pin_fallback', 0, 0, 22.8046, 86.2029, 1, 'present', 0);
 
     // 13. AI Brain Knowledge Base
     const insertKb = db.prepare(`INSERT INTO ai_knowledge (id, tenant_id, category, title, content) VALUES (?, ?, ?, ?, ?)`);
-    insertKb.run('kb_1', 'ten_vanguard', 'business', 'Company Profile & Showrooms', 'Vanguard Ceramics & Hardware operates 3 branches: South Flagship Showroom (Bandra West, Mumbai), West Industrial Depot (MIDC Navi Mumbai), and East Express Hub (Surat, Gujarat). Open Mon-Sun 9:30 AM to 8:30 PM.');
+    insertKb.run('kb_1', 'ten_vanguard', 'business', 'Company Profile & Showrooms', 'Jharkhand Tiles & Hardware operates 3 shops: Rinku 1 (Ratu Road, Ranchi), Rinku 2 (Bank More, Dhanbad), and Rinku 3 (Bistupur, Jamshedpur) in Jharkhand. Open Mon-Sun 9:30 AM to 8:30 PM.');
     insertKb.run('kb_2', 'ten_vanguard', 'policy', 'Delivery & Breakage Replacement Policy', 'Free local crane/tempo delivery on orders above ₹25,000 within 15 km. Transit tile breakage above 2% is replaced free of charge if reported within 24 hours with unboxing video.');
     insertKb.run('kb_3', 'ten_vanguard', 'warranty', 'Sanitaryware & Paint Warranty', 'Kohler & Jaquar brass mixers carry 7-year cartridge warranty. Asian Paints Royale Aspira & Apex Ultima carry manufacturer performance warranty against flaking when applied with recommended primer.');
     insertKb.run('kb_4', 'ten_vanguard', 'sales_script', 'Contractor & Builder Quote Script', 'For bulk tile orders (>50 boxes), highlight batch/lot consistency, 15.5 sq.ft/box coverage on 600x1200mm GVT slabs, and bundle MYK Laticrete Type-3 adhesive for 10% better bond strength.');
 
     // 14. WhatsApp Demo Logs & Complaints
     db.prepare(`INSERT INTO whatsapp_logs (id, tenant_id, branch_id, customer_id, phone, direction, template_name, message_body, status, is_demo, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      'wa_1', 'ten_vanguard', 'br_vg_south', 'cust_1', '+91 98210 45001', 'outbound', 'due_payment_reminder_v1', 'Dear Oberoi Skyline Infra Pvt. Ltd., gentle reminder for invoice INV-STH-2026-0892 balance of ₹1,18,400 due on ' + yesterday + '. Reply PAID once transferred.', 'simulated', 1, `${today}T09:00:00`
+      'wa_1', 'ten_vanguard', 'br_vg_south', 'cust_1', '+91 94311 45001', 'outbound', 'due_payment_reminder_v1', 'Dear Chotanagpur Infra & Builders Pvt. Ltd., gentle reminder for invoice INV-STH-2026-0892 balance of ₹1,18,400 due on ' + yesterday + '. Reply PAID once transferred.', 'simulated', 1, `${today}T09:00:00`
     );
     db.prepare(`INSERT INTO whatsapp_logs (id, tenant_id, branch_id, customer_id, phone, direction, template_name, message_body, status, is_demo, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      'wa_2', 'ten_vanguard', 'br_vg_south', 'cust_2', '+91 98211 78900', 'inbound', null, 'Hi, do you have 40 boxes of Statuario Imperiale 600x1200mm in the same batch lot at Bandra showroom?', 'read', 1, `${today}T09:42:00`
+      'wa_2', 'ten_vanguard', 'br_vg_south', 'cust_2', '+91 94312 78900', 'inbound', null, 'Hi, do you have 40 boxes of Statuario Imperiale 600x1200mm in the same batch lot at Rinku 1 Ranchi showroom?', 'read', 1, `${today}T09:42:00`
     );
 
     db.prepare(`INSERT INTO customer_complaints (id, tenant_id, branch_id, customer_id, subject, description, status, assigned_to, follow_up_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      'cmp_1', 'ten_vanguard', 'br_vg_west', 'cust_3', '2 Corner Chips in Crate #4', 'Reported 2 chipped tiles upon site delivery at Vashi Sector 17.', 'in_progress', 'usr_vg_sales2', today
+      'cmp_1', 'ten_vanguard', 'br_vg_west', 'cust_3', '2 Corner Chips in Crate #4', 'Reported 2 chipped tiles upon site delivery at Saraidhela, Dhanbad.', 'in_progress', 'usr_vg_sales2', today
     );
 
     // 15. Integration Configs (Not Configured by default so UI clearly indicates status)

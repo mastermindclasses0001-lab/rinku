@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, ArrowLeftRight, Truck, Search, AlertCircle, Check, PackagePlus, History, Building2 } from 'lucide-react';
+import { Plus, ArrowLeftRight, Truck, Search, AlertCircle, Check, PackagePlus, History, Building2, FileSpreadsheet } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { apiFetch } from '../lib/api';
+import { apiDownloadFile, apiFetch } from '../lib/api';
 import { Product } from '../types/erp';
 
 type InvTab = 'catalog' | 'transfers' | 'purchases' | 'movements' | 'branches';
@@ -23,6 +23,7 @@ export const InventoryModule: React.FC = () => {
   const [showPoModal, setShowPoModal] = useState(false);
   const [showBranchModal, setShowBranchModal] = useState(false);
   const [adjustTarget, setAdjustTarget] = useState<Product | null>(null);
+  const [exportingStock, setExportingStock] = useState(false);
 
   const sym = tenant?.currency_symbol || '₹';
 
@@ -186,7 +187,7 @@ export const InventoryModule: React.FC = () => {
   };
 
   // New Branch
-  const [branchForm, setBranchForm] = useState({ code: '', name: '', city: '', state: 'Maharashtra', stateCode: '27', address: '', phone: '' });
+  const [branchForm, setBranchForm] = useState({ code: '', name: '', city: 'Ranchi', state: 'Jharkhand', stateCode: '20', address: '', phone: '' });
   const handleCreateBranch = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -209,11 +210,11 @@ export const InventoryModule: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-4">
         <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-[#171C28] p-1 rounded-lg">
           {[
-            { id: 'catalog' as InvTab, label: 'Product Catalog & Stock' },
-            { id: 'transfers' as InvTab, label: `Stock Transfers (${transfers.filter((t) => t.status === 'dispatched').length})` },
-            { id: 'purchases' as InvTab, label: 'Suppliers & Purchase Orders' },
-            { id: 'movements' as InvTab, label: 'Stock Movement Ledger' },
-            { id: 'branches' as InvTab, label: `Branches (${branches.length})` },
+            { id: 'catalog' as InvTab, label: 'Catalog & Stock / स्टॉक' },
+            { id: 'transfers' as InvTab, label: `Transfers / ट्रांसफर (${transfers.filter((t) => t.status === 'dispatched').length})` },
+            { id: 'purchases' as InvTab, label: 'Purchase Orders / खरीद' },
+            { id: 'movements' as InvTab, label: 'Stock Ledger / लेजर' },
+            { id: 'branches' as InvTab, label: `Shops / दुकानें (${branches.length})` },
           ].map((t) => (
             <button
               key={t.id}
@@ -229,25 +230,46 @@ export const InventoryModule: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2">
           <button
+            disabled={exportingStock}
+            onClick={async () => {
+              setExportingStock(true);
+              try {
+                await apiDownloadFile(
+                  `/api/reports/export/excel?type=stock_valuation&branchId=${activeBranchId}`,
+                  `stock_valuation_${activeBranchId}.xlsx`
+                );
+                notify('success', 'Stock Excel (.xlsx) downloaded / स्टॉक एक्सेल डाउनलोड हो गई');
+              } catch (err: any) {
+                notify('error', err.message || 'Stock Excel export failed');
+              } finally {
+                setExportingStock(false);
+              }
+            }}
+            className="px-3 py-2 rounded-lg border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 text-xs font-medium flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            {exportingStock ? 'Exporting... / बन रहा है' : 'Stock Excel / स्टॉक एक्सेल'}
+          </button>
+          <button
             onClick={() => setShowTransferModal(true)}
             className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium hover:border-sky-500/40 flex items-center gap-1.5"
           >
             <ArrowLeftRight className="w-3.5 h-3.5 text-amber-400" />
-            Transfer Stock
+            Transfer Stock / स्टॉक भेजें
           </button>
           <button
             onClick={() => setShowPoModal(true)}
             className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium hover:border-sky-500/40 flex items-center gap-1.5"
           >
             <Truck className="w-3.5 h-3.5 text-emerald-400" />
-            New Purchase Order
+            New PO / नई खरीद
           </button>
           <button
             onClick={() => setShowAddProduct(true)}
             className="px-3 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold flex items-center gap-1.5"
           >
             <Plus className="w-3.5 h-3.5" />
-            Add SKU
+            Add SKU / नया प्रोडक्ट
           </button>
         </div>
       </div>
@@ -261,25 +283,31 @@ export const InventoryModule: React.FC = () => {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search SKU, barcode, shade, batch, brand..."
+                placeholder="Search SKU, barcode, shade, brand / प्रोडक्ट खोजें..."
                 className="w-full pl-9 pr-3 py-2 rounded-lg bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 text-xs focus:outline-none focus:border-sky-500"
               />
             </div>
             <div className="md:col-span-4 flex items-center gap-1 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 p-1 rounded-lg overflow-x-auto">
-              {['All', 'Tiles', 'Paint', 'Sanitaryware', 'Hardware'].map((c) => (
+              {[
+                { id: 'All', label: 'All / सभी' },
+                { id: 'Tiles', label: 'Tiles / टाइल्स' },
+                { id: 'Paint', label: 'Paint / पेंट' },
+                { id: 'Sanitaryware', label: 'Sanitary / सैनिटरी' },
+                { id: 'Hardware', label: 'Hardware / हार्डवेयर' },
+              ].map((c) => (
                 <button
-                  key={c}
-                  onClick={() => setCategory(c)}
+                  key={c.id}
+                  onClick={() => setCategory(c.id)}
                   className={`px-2.5 py-1 rounded text-xs font-medium whitespace-nowrap ${
-                    category === c ? 'bg-sky-500/15 text-sky-400' : 'text-slate-500 hover:text-slate-200'
+                    category === c.id ? 'bg-sky-500/15 text-sky-400' : 'text-slate-500 hover:text-slate-200'
                   }`}
                 >
-                  {c}
+                  {c.label}
                 </button>
               ))}
             </div>
             <div className="md:col-span-3 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2 flex items-center justify-between text-xs">
-              <span className="text-slate-500">Stock Cost Value:</span>
+              <span className="text-slate-500">Stock Value / स्टॉक मूल्य:</span>
               <span className="font-mono font-bold text-emerald-400">{sym}{totalCostVal.toLocaleString()}</span>
             </div>
           </div>
@@ -290,14 +318,14 @@ export const InventoryModule: React.FC = () => {
               <table className="w-full text-xs">
                 <thead className="bg-slate-50 dark:bg-[#171C28] border-b border-slate-200 dark:border-white/10 text-slate-500 text-left">
                   <tr>
-                    <th className="p-3 font-medium">Product / SKU</th>
-                    <th className="p-3 font-medium">Category & Specs</th>
-                    <th className="p-3 font-medium">Unit Conv.</th>
-                    <th className="p-3 font-medium text-right">Purchase</th>
-                    <th className="p-3 font-medium text-right">Selling (GST%)</th>
-                    <th className="p-3 font-medium text-right">Available</th>
-                    <th className="p-3 font-medium text-right">Dmg / Dead</th>
-                    <th className="p-3 font-medium text-right">Action</th>
+                    <th className="p-3 font-medium">Product / प्रोडक्ट</th>
+                    <th className="p-3 font-medium">Category / श्रेणी</th>
+                    <th className="p-3 font-medium">Unit Conv. / इकाई</th>
+                    <th className="p-3 font-medium text-right">Purchase / खरीद</th>
+                    <th className="p-3 font-medium text-right">Selling / बिक्री (GST%)</th>
+                    <th className="p-3 font-medium text-right">Available / उपलब्ध</th>
+                    <th className="p-3 font-medium text-right">Dmg / खराब</th>
+                    <th className="p-3 font-medium text-right">Action / कार्य</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -351,7 +379,7 @@ export const InventoryModule: React.FC = () => {
                             }}
                             className="px-2.5 py-1 rounded border border-slate-200 dark:border-white/10 hover:border-sky-500/40 text-[11px] font-medium"
                           >
-                            Adjust
+                            Adjust / सुधारें
                           </button>
                         </td>
                       </tr>
@@ -361,8 +389,8 @@ export const InventoryModule: React.FC = () => {
               </table>
             </div>
             <div className="px-4 py-3 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between text-xs text-slate-500">
-              <span>Showing {products.length} active SKUs</span>
-              <span className="font-mono">Retail Valuation: {sym}{totalRetailVal.toLocaleString()}</span>
+              <span>Showing {products.length} active SKUs / सक्रिय प्रोडक्ट</span>
+              <span className="font-mono">Retail Valuation / बिक्री मूल्य: {sym}{totalRetailVal.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -373,12 +401,12 @@ export const InventoryModule: React.FC = () => {
           <table className="w-full text-xs">
             <thead className="bg-slate-50 dark:bg-[#171C28] border-b border-slate-200 dark:border-white/10 text-slate-500 text-left">
               <tr>
-                <th className="p-3">Transfer No</th>
-                <th className="p-3">Route</th>
-                <th className="p-3">Items</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Dispatched</th>
-                <th className="p-3 text-right">Action</th>
+                <th className="p-3">Transfer No / नं.</th>
+                <th className="p-3">Route / कहां से कहां</th>
+                <th className="p-3">Items / सामान</th>
+                <th className="p-3">Status / स्थिति</th>
+                <th className="p-3">Dispatched / भेजा गया</th>
+                <th className="p-3 text-right">Action / कार्य</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -401,10 +429,10 @@ export const InventoryModule: React.FC = () => {
                         onClick={() => handleReceiveTransfer(t.id)}
                         className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs inline-flex items-center gap-1"
                       >
-                        <Check className="w-3.5 h-3.5" /> Confirm Receipt
+                        <Check className="w-3.5 h-3.5" /> Confirm Receipt / प्राप्त करें
                       </button>
                     ) : (
-                      <span className="text-slate-500 font-mono">Completed</span>
+                      <span className="text-slate-500 font-mono">Completed / प्राप्त</span>
                     )}
                   </td>
                 </tr>
@@ -417,7 +445,7 @@ export const InventoryModule: React.FC = () => {
       {tab === 'purchases' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-4 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-4 space-y-3">
-            <h3 className="font-display font-semibold text-sm">Suppliers & Payables</h3>
+            <h3 className="font-display font-semibold text-sm">Suppliers & Payables / सप्लायर बकाया</h3>
             {suppliers.map((s) => (
               <div key={s.id} className="p-3 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-slate-200 dark:border-white/5 flex items-center justify-between text-xs">
                 <div>
@@ -433,12 +461,12 @@ export const InventoryModule: React.FC = () => {
             <table className="w-full text-xs">
               <thead className="bg-slate-50 dark:bg-[#171C28] border-b border-slate-200 dark:border-white/10 text-slate-500 text-left">
                 <tr>
-                  <th className="p-3">PO Number</th>
-                  <th className="p-3">Supplier</th>
-                  <th className="p-3">Branch</th>
-                  <th className="p-3 text-right">Total (incl. GST)</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-right">Action</th>
+                  <th className="p-3">PO Number / ऑर्डर नं.</th>
+                  <th className="p-3">Supplier / सप्लायर</th>
+                  <th className="p-3">Shop / दुकान</th>
+                  <th className="p-3 text-right">Total / कुल (GST)</th>
+                  <th className="p-3">Status / स्थिति</th>
+                  <th className="p-3 text-right">Action / कार्य</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -461,7 +489,7 @@ export const InventoryModule: React.FC = () => {
                           }}
                           className="px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-semibold text-xs"
                         >
-                          Receive Stock
+                          Receive Stock / स्टॉक लें
                         </button>
                       )}
                     </td>
@@ -476,17 +504,17 @@ export const InventoryModule: React.FC = () => {
       {tab === 'movements' && (
         <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
           <div className="p-4 border-b border-slate-200 dark:border-white/10 flex items-center gap-2 text-sm font-semibold">
-            <History className="w-4 h-4 text-sky-400" /> Complete Stock Movement Audit Trail
+            <History className="w-4 h-4 text-sky-400" /> Stock Movement Audit Trail / स्टॉक आवाजाही लेजर
           </div>
           <table className="w-full text-xs">
             <thead className="bg-slate-50 dark:bg-[#171C28] border-b border-slate-200 dark:border-white/10 text-slate-500 text-left">
               <tr>
-                <th className="p-3">Timestamp</th>
-                <th className="p-3">Branch</th>
-                <th className="p-3">Product</th>
-                <th className="p-3">Type</th>
-                <th className="p-3">Reference</th>
-                <th className="p-3 text-right">Qty Delta</th>
+                <th className="p-3">Timestamp / समय</th>
+                <th className="p-3">Shop / दुकान</th>
+                <th className="p-3">Product / प्रोडक्ट</th>
+                <th className="p-3">Type / प्रकार</th>
+                <th className="p-3">Reference / विवरण</th>
+                <th className="p-3 text-right">Qty Delta / बदलाव</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -514,7 +542,7 @@ export const InventoryModule: React.FC = () => {
               onClick={() => setShowBranchModal(true)}
               className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold text-xs flex items-center gap-1.5"
             >
-              <Building2 className="w-3.5 h-3.5" /> Add Unlimited Branch
+              <Building2 className="w-3.5 h-3.5" /> Add Unlimited Shop / नई दुकान जोड़ें
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -522,7 +550,7 @@ export const InventoryModule: React.FC = () => {
               <div key={b.id} className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-5 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs text-sky-400">{b.code}</span>
-                  {b.is_headquarters === 1 && <span className="text-[11px] font-mono text-emerald-400">HEADQUARTERS</span>}
+                  {b.is_headquarters === 1 && <span className="text-[11px] font-mono text-emerald-400">HEADQUARTERS / मुख्य</span>}
                 </div>
                 <div className="font-display font-bold text-base">{b.name}</div>
                 <div className="text-xs text-slate-500 dark:text-slate-400">{b.address}, {b.city}, {b.state}</div>
@@ -540,35 +568,89 @@ export const InventoryModule: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <form onSubmit={handleCreateProduct} className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h3 className="font-display font-bold text-lg flex items-center gap-2"><PackagePlus className="w-5 h-5 text-sky-400" /> Add New Product SKU</h3>
-              <button type="button" onClick={() => setShowAddProduct(false)} className="text-xs text-slate-400">Close</button>
+              <h3 className="font-display font-bold text-lg flex items-center gap-2"><PackagePlus className="w-5 h-5 text-sky-400" /> Add New Product SKU / नया प्रोडक्ट जोड़ें</h3>
+              <button type="button" onClick={() => setShowAddProduct(false)} className="text-xs text-slate-400">Close / बंद करें</button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-              <select value={newProd.categoryName} onChange={(e) => setNewProd({ ...newProd, categoryName: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                <option value="Tiles">Tiles</option>
-                <option value="Paint">Paint</option>
-                <option value="Sanitaryware">Sanitaryware</option>
-                <option value="Hardware">Hardware</option>
-              </select>
-              <input required placeholder="SKU *" value={newProd.sku} onChange={(e) => setNewProd({ ...newProd, sku: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input placeholder="Brand" value={newProd.brand} onChange={(e) => setNewProd({ ...newProd, brand: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-              <input required placeholder="Product Name *" value={newProd.name} onChange={(e) => setNewProd({ ...newProd, name: e.target.value })} className="col-span-2 sm:col-span-3 px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-              <input placeholder="HSN Code" value={newProd.hsnCode} onChange={(e) => setNewProd({ ...newProd, hsnCode: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input type="number" placeholder="GST %" value={newProd.gstRate} onChange={(e) => setNewProd({ ...newProd, gstRate: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input placeholder="Unit (Box/Bucket/Pc)" value={newProd.unit} onChange={(e) => setNewProd({ ...newProd, unit: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-              <input placeholder="Base Unit (Sq Ft/Litre)" value={newProd.baseUnit} onChange={(e) => setNewProd({ ...newProd, baseUnit: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-              <input type="number" step="0.01" placeholder="Conversion (e.g. 15.5)" value={newProd.conversionFactor} onChange={(e) => setNewProd({ ...newProd, conversionFactor: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input placeholder="Shade / Color Code" value={newProd.shade} onChange={(e) => setNewProd({ ...newProd, shade: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-              <input placeholder="Batch / Lot No" value={newProd.batchNo} onChange={(e) => setNewProd({ ...newProd, batchNo: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-              <input type="number" placeholder="Purchase Price *" value={newProd.purchasePrice} onChange={(e) => setNewProd({ ...newProd, purchasePrice: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input type="number" placeholder="MRP" value={newProd.mrp} onChange={(e) => setNewProd({ ...newProd, mrp: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input type="number" placeholder="Selling Price *" value={newProd.sellingPrice} onChange={(e) => setNewProd({ ...newProd, sellingPrice: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input type="number" placeholder="Min Stock Alert" value={newProd.minStock} onChange={(e) => setNewProd({ ...newProd, minStock: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input type="number" placeholder="Opening Stock Qty" value={newProd.openingStock} onChange={(e) => setNewProd({ ...newProd, openingStock: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Category / श्रेणी</label>
+                <select value={newProd.categoryName} onChange={(e) => setNewProd({ ...newProd, categoryName: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  <option value="Tiles">Tiles / टाइल्स</option>
+                  <option value="Paint">Paint / पेंट</option>
+                  <option value="Sanitaryware">Sanitaryware / सैनिटरी</option>
+                  <option value="Hardware">Hardware / हार्डवेयर</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">SKU Code / कोड *</label>
+                <input required placeholder="e.g. TIL-001" value={newProd.sku} onChange={(e) => setNewProd({ ...newProd, sku: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Brand / ब्रांड</label>
+                <input placeholder="e.g. Kajaria / Asian" value={newProd.brand} onChange={(e) => setNewProd({ ...newProd, brand: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
+              <div className="col-span-2 sm:col-span-3">
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Product Name / प्रोडक्ट का नाम *</label>
+                <input required placeholder="Full Product Name" value={newProd.name} onChange={(e) => setNewProd({ ...newProd, name: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">HSN Code / एचएसएन कोड</label>
+                <input placeholder="69072100" value={newProd.hsnCode} onChange={(e) => setNewProd({ ...newProd, hsnCode: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">GST Rate (%) / जीएसटी %</label>
+                <input type="number" placeholder="18" value={newProd.gstRate} onChange={(e) => setNewProd({ ...newProd, gstRate: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Selling Unit / इकाई (Box/Pc)</label>
+                <input placeholder="Box / Bucket / Pc" value={newProd.unit} onChange={(e) => setNewProd({ ...newProd, unit: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Base Unit / छोटी इकाई (Sq Ft/Ltr)</label>
+                <input placeholder="Sq Ft / Litre" value={newProd.baseUnit} onChange={(e) => setNewProd({ ...newProd, baseUnit: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Conversion / प्रति बॉक्स माप</label>
+                <input type="number" step="0.01" placeholder="15.5" value={newProd.conversionFactor} onChange={(e) => setNewProd({ ...newProd, conversionFactor: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Shade / रंग कोड</label>
+                <input placeholder="Optional" value={newProd.shade} onChange={(e) => setNewProd({ ...newProd, shade: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Batch / Lot No / बैच नंबर</label>
+                <input placeholder="Optional" value={newProd.batchNo} onChange={(e) => setNewProd({ ...newProd, batchNo: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Purchase Price (₹) / खरीद दर *</label>
+                <input type="number" placeholder="900" value={newProd.purchasePrice} onChange={(e) => setNewProd({ ...newProd, purchasePrice: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">MRP (₹) / अधिकतम मूल्य</label>
+                <input type="number" placeholder="1500" value={newProd.mrp} onChange={(e) => setNewProd({ ...newProd, mrp: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Selling Price (₹) / बिक्री दर *</label>
+                <input type="number" placeholder="1250" value={newProd.sellingPrice} onChange={(e) => setNewProd({ ...newProd, sellingPrice: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Min Stock Alert / कम स्टॉक सीमा</label>
+                <input type="number" placeholder="15" value={newProd.minStock} onChange={(e) => setNewProd({ ...newProd, minStock: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Opening Shop / शुरुआती दुकान</label>
+                <select value={newProd.openingBranchId || branches[0]?.id || ''} onChange={(e) => setNewProd({ ...newProd, openingBranchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Opening Stock Qty / शुरुआती स्टॉक</label>
+                <input type="number" placeholder="40" value={newProd.openingStock} onChange={(e) => setNewProd({ ...newProd, openingStock: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setShowAddProduct(false)} className="px-4 py-2 rounded-lg border border-white/10 text-xs">Cancel</button>
-              <button type="submit" className="px-4 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold text-xs">Save SKU</button>
+              <button type="button" onClick={() => setShowAddProduct(false)} className="px-4 py-2 rounded-lg border border-white/10 text-xs">Cancel / रद्द</button>
+              <button type="submit" className="px-4 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold text-xs">Save SKU / सेव करें</button>
             </div>
           </form>
         </div>
@@ -578,22 +660,34 @@ export const InventoryModule: React.FC = () => {
       {adjustTarget && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <form onSubmit={handleAdjustStock} className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-md w-full p-6 space-y-4">
-            <h3 className="font-display font-bold">Adjust Stock — {adjustTarget.sku}</h3>
+            <h3 className="font-display font-bold">Adjust Stock / स्टॉक सुधारें — {adjustTarget.sku}</h3>
             <div className="space-y-3 text-xs">
-              <select value={adjForm.branchId} onChange={(e) => setAdjForm({ ...adjForm, branchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
-              <select value={adjForm.movementType} onChange={(e) => setAdjForm({ ...adjForm, movementType: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                <option value="adjustment">Stock Count Adjustment (+/-)</option>
-                <option value="damage">Mark Damaged Stock</option>
-                <option value="dead_stock">Mark Dead Stock</option>
-              </select>
-              <input type="number" required value={adjForm.qtyDelta} onChange={(e) => setAdjForm({ ...adjForm, qtyDelta: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input placeholder="Reason / Audit Notes" value={adjForm.notes} onChange={(e) => setAdjForm({ ...adjForm, notes: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Shop / दुकान</label>
+                <select value={adjForm.branchId} onChange={(e) => setAdjForm({ ...adjForm, branchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Adjustment Type / प्रकार</label>
+                <select value={adjForm.movementType} onChange={(e) => setAdjForm({ ...adjForm, movementType: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  <option value="adjustment">Stock Count Adjustment / गिनती सुधार (+/-)</option>
+                  <option value="damage">Mark Damaged Stock / टूटा-खराब स्टॉक</option>
+                  <option value="dead_stock">Mark Dead Stock / डेड स्टॉक</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Qty Change (+/-) / मात्रा बदलाव</label>
+                <input type="number" required value={adjForm.qtyDelta} onChange={(e) => setAdjForm({ ...adjForm, qtyDelta: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Reason / Notes / कारण</label>
+                <input placeholder="Reason / कारण व नोट्स" value={adjForm.notes} onChange={(e) => setAdjForm({ ...adjForm, notes: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setAdjustTarget(null)} className="px-4 py-2 rounded-lg border border-white/10 text-xs">Cancel</button>
-              <button type="submit" className="px-4 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold text-xs">Apply Adjustment</button>
+              <button type="button" onClick={() => setAdjustTarget(null)} className="px-4 py-2 rounded-lg border border-white/10 text-xs">Cancel / रद्द</button>
+              <button type="submit" className="px-4 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold text-xs">Apply / लागू करें</button>
             </div>
           </form>
         </div>
@@ -603,32 +697,38 @@ export const InventoryModule: React.FC = () => {
       {showTransferModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <form onSubmit={handleCreateTransfer} className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-md w-full p-6 space-y-4">
-            <h3 className="font-display font-bold">Dispatch Inter-Branch Transfer</h3>
+            <h3 className="font-display font-bold">Dispatch Transfer / दुकान से दुकान स्टॉक भेजें</h3>
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-400 mb-1">From Branch</label>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">From Shop / किस दुकान से</label>
                 <select value={trfForm.fromBranchId} onChange={(e) => setTrfForm({ ...trfForm, fromBranchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
                   {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-slate-400 mb-1">To Branch</label>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">To Shop / किस दुकान को</label>
                 <select value={trfForm.toBranchId} onChange={(e) => setTrfForm({ ...trfForm, toBranchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
                   {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-slate-400 mb-1">Product SKU</label>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Product SKU / प्रोडक्ट चुनें</label>
                 <select value={trfForm.productId || products[0]?.id} onChange={(e) => setTrfForm({ ...trfForm, productId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
                   {products.map((p) => <option key={p.id} value={p.id}>{p.sku} — {p.name}</option>)}
                 </select>
               </div>
-              <input type="number" min={1} value={trfForm.qty} onChange={(e) => setTrfForm({ ...trfForm, qty: Number(e.target.value) })} placeholder="Qty" className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input value={trfForm.notes} onChange={(e) => setTrfForm({ ...trfForm, notes: e.target.value })} placeholder="Vehicle / Challan Notes" className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Transfer Qty / भेजने की मात्रा</label>
+                <input type="number" min={1} value={trfForm.qty} onChange={(e) => setTrfForm({ ...trfForm, qty: Number(e.target.value) })} placeholder="Qty / मात्रा" className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Vehicle / Challan Notes / चालान विवरण</label>
+                <input value={trfForm.notes} onChange={(e) => setTrfForm({ ...trfForm, notes: e.target.value })} placeholder="Vehicle / Challan Notes / गाड़ी या चालान विवरण" className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowTransferModal(false)} className="px-4 py-2 rounded-lg border border-white/10 text-xs">Cancel</button>
-              <button type="submit" className="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 font-semibold text-xs">Dispatch Transfer</button>
+              <button type="button" onClick={() => setShowTransferModal(false)} className="px-4 py-2 rounded-lg border border-white/10 text-xs">Cancel / रद्द</button>
+              <button type="submit" className="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 font-semibold text-xs">Dispatch / भेजें</button>
             </div>
           </form>
         </div>
@@ -638,29 +738,44 @@ export const InventoryModule: React.FC = () => {
       {showPoModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <form onSubmit={handleCreatePo} className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-md w-full p-6 space-y-4">
-            <h3 className="font-display font-bold">Create Supplier Purchase Order</h3>
+            <h3 className="font-display font-bold">Create Purchase Order / नया खरीद ऑर्डर (PO)</h3>
             <div className="space-y-3 text-xs">
-              <select value={poForm.branchId} onChange={(e) => setPoForm({ ...poForm, branchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
-              <select value={poForm.supplierId || suppliers[0]?.id} onChange={(e) => setPoForm({ ...poForm, supplierId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
-              <select value={poForm.productId || products[0]?.id} onChange={(e) => setPoForm({ ...poForm, productId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                {products.map((p) => <option key={p.id} value={p.id}>{p.sku} — {p.name}</option>)}
-              </select>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Receiving Shop / किस दुकान के लिए</label>
+                <select value={poForm.branchId} onChange={(e) => setPoForm({ ...poForm, branchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Supplier / सप्लायर</label>
+                <select value={poForm.supplierId || suppliers[0]?.id} onChange={(e) => setPoForm({ ...poForm, supplierId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Product / प्रोडक्ट चुनें</label>
+                <select value={poForm.productId || products[0]?.id} onChange={(e) => setPoForm({ ...poForm, productId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  {products.map((p) => <option key={p.id} value={p.id}>{p.sku} — {p.name}</option>)}
+                </select>
+              </div>
               <div className="grid grid-cols-2 gap-2">
-                <input type="number" min={1} placeholder="Qty" value={poForm.qty} onChange={(e) => setPoForm({ ...poForm, qty: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-                <input type="number" placeholder="Unit Cost" value={poForm.unitCost} onChange={(e) => setPoForm({ ...poForm, unitCost: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+                <div>
+                  <label className="block text-[11px] font-medium text-slate-400 mb-1">Order Qty / ऑर्डर मात्रा</label>
+                  <input type="number" min={1} placeholder="Qty / मात्रा" value={poForm.qty} onChange={(e) => setPoForm({ ...poForm, qty: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-slate-400 mb-1">Unit Cost (₹) / खरीद दर</label>
+                  <input type="number" placeholder="Unit Cost / खरीद दर" value={poForm.unitCost} onChange={(e) => setPoForm({ ...poForm, unitCost: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+                </div>
               </div>
               <label className="flex items-center gap-2">
                 <input type="checkbox" checked={poForm.receiveImmediately} onChange={(e) => setPoForm({ ...poForm, receiveImmediately: e.target.checked })} />
-                <span>Receive directly into branch inventory now</span>
+                <span>Receive directly into shop stock / तुरंत स्टॉक में जोड़ें</span>
               </label>
             </div>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowPoModal(false)} className="px-4 py-2 rounded-lg border border-white/10 text-xs">Cancel</button>
-              <button type="submit" className="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 font-semibold text-xs">Submit PO</button>
+              <button type="button" onClick={() => setShowPoModal(false)} className="px-4 py-2 rounded-lg border border-white/10 text-xs">Cancel / रद्द</button>
+              <button type="submit" className="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 font-semibold text-xs">Submit PO / ऑर्डर सेव करें</button>
             </div>
           </form>
         </div>
@@ -670,18 +785,40 @@ export const InventoryModule: React.FC = () => {
       {showBranchModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <form onSubmit={handleCreateBranch} className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-md w-full p-6 space-y-3 text-xs">
-            <h3 className="font-display font-bold text-base">Add New Branch Location</h3>
-            <input required placeholder="Branch Name *" value={branchForm.name} onChange={(e) => setBranchForm({ ...branchForm, name: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-            <div className="grid grid-cols-2 gap-2">
-              <input placeholder="Branch Code (e.g. BR-NTH)" value={branchForm.code} onChange={(e) => setBranchForm({ ...branchForm, code: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input required placeholder="City *" value={branchForm.city} onChange={(e) => setBranchForm({ ...branchForm, city: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-              <input placeholder="State" value={branchForm.state} onChange={(e) => setBranchForm({ ...branchForm, state: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-              <input placeholder="GST State Code (e.g. 27)" value={branchForm.stateCode} onChange={(e) => setBranchForm({ ...branchForm, stateCode: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+            <h3 className="font-display font-bold text-base">Add New Shop / नई दुकान जोड़ें</h3>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Shop Name / दुकान का नाम *</label>
+              <input required placeholder="e.g. Rinku 4" value={branchForm.name} onChange={(e) => setBranchForm({ ...branchForm, name: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
             </div>
-            <input placeholder="Full Address" value={branchForm.address} onChange={(e) => setBranchForm({ ...branchForm, address: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Shop Code / कोड</label>
+                <input placeholder="e.g. BR-4" value={branchForm.code} onChange={(e) => setBranchForm({ ...branchForm, code: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">City / शहर *</label>
+                <input required placeholder="Ranchi / Dhanbad" value={branchForm.city} onChange={(e) => setBranchForm({ ...branchForm, city: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">State / राज्य</label>
+                <input placeholder="Jharkhand" value={branchForm.state} onChange={(e) => setBranchForm({ ...branchForm, state: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">GST State Code / राज्य कोड</label>
+                <input placeholder="20" value={branchForm.stateCode} onChange={(e) => setBranchForm({ ...branchForm, stateCode: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Phone / फोन नंबर</label>
+              <input placeholder="+91 ..." value={branchForm.phone} onChange={(e) => setBranchForm({ ...branchForm, phone: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Full Address / पूरा पता</label>
+              <input placeholder="Main Road, Jharkhand" value={branchForm.address} onChange={(e) => setBranchForm({ ...branchForm, address: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setShowBranchModal(false)} className="px-4 py-2 rounded-lg border border-white/10">Cancel</button>
-              <button type="submit" className="px-4 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Create Branch</button>
+              <button type="button" onClick={() => setShowBranchModal(false)} className="px-4 py-2 rounded-lg border border-white/10">Cancel / रद्द</button>
+              <button type="submit" className="px-4 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Create Shop / दुकान बनाएं</button>
             </div>
           </form>
         </div>

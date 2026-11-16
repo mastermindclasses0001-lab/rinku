@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Invoice, TenantInfo } from '../types/erp';
+import { triggerBlobDownload } from './api';
 
 export function generateInvoicePdf(invoice: Invoice, tenant: TenantInfo, format: 'a4' | 'thermal' = 'a4') {
   const doc =
@@ -62,7 +63,7 @@ export function generateInvoicePdf(invoice: Invoice, tenant: TenantInfo, format:
     doc.text(`Paid: ${sym}${invoice.paid_amount.toFixed(2)} | Due: ${sym}${invoice.due_amount.toFixed(2)}`, 4, y);
     y += 6;
     doc.text('Thank you for your business!', 40, y, { align: 'center' });
-    doc.save(`${invoice.invoice_no}_thermal.pdf`);
+    triggerBlobDownload(doc.output('blob'), `${invoice.invoice_no}_thermal.pdf`);
     return;
   }
 
@@ -134,7 +135,7 @@ export function generateInvoicePdf(invoice: Invoice, tenant: TenantInfo, format:
   doc.setTextColor(100, 116, 139);
   doc.text(tenant.branding?.invoiceFooter || 'Authorized Computer Generated Tax Invoice', 14, 282);
 
-  doc.save(`${invoice.invoice_no}.pdf`);
+  triggerBlobDownload(doc.output('blob'), `${invoice.invoice_no}.pdf`);
 }
 
 export function generateSalarySlipPdf(
@@ -183,5 +184,5 @@ export function generateSalarySlipPdf(
     headStyles: { fillColor: [15, 23, 42] },
   });
 
-  doc.save(`SalarySlip_${emp.full_name.replace(/\s+/g, '_')}.pdf`);
+  triggerBlobDownload(doc.output('blob'), `SalarySlip_${emp.full_name.replace(/\s+/g, '_')}.pdf`);
 }

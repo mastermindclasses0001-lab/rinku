@@ -19,6 +19,7 @@ import {
 } from './src/lib/crypto.ts';
 import { runCustomerEnquiryAi, runOwnerAssistantAi } from './src/lib/aiService.ts';
 import { buildExcelReport, ReportType } from './src/lib/excelExport.ts';
+import { buildCleanSourceZip } from './src/lib/sourceZip.ts';
 
 initDatabase();
 
@@ -222,13 +223,13 @@ app.post('/api/auth/setup-wizard', (req, res) => {
       phone || '',
       email || ownerEmail,
       JSON.stringify({ accent: '#38BDF8', invoiceFooter: `Thank you for your business with ${businessName}.`, financialYear: '2026-27', language: 'en-IN' }),
-      JSON.stringify({ reminderTime: '09:00', allowNegativeStock: false, maxCashierDiscountPct: 10, stateCode: stateCode || '27' })
+      JSON.stringify({ reminderTime: '09:00', allowNegativeStock: false, maxCashierDiscountPct: 10, stateCode: stateCode || '20' })
     );
 
     db.prepare(`
       INSERT INTO branches (id, tenant_id, code, name, address, city, state, state_code, gstin, phone, is_headquarters)
       VALUES (?, ?, 'BR-HQ', ?, ?, ?, ?, ?, ?, ?, 1)
-    `).run(branchId, tenantId, branchName, address || branchCity || 'Main Road', branchCity || 'Mumbai', branchState || 'Maharashtra', stateCode || '27', gstin || '', phone || '');
+    `).run(branchId, tenantId, branchName, address || branchCity || 'Main Road', branchCity || 'Ranchi', branchState || 'Jharkhand', stateCode || '20', gstin || '', phone || '');
 
     db.prepare(`
       INSERT INTO users (id, tenant_id, branch_id, email, password_hash, full_name, role, pin_code, phone, joining_date)
@@ -307,16 +308,16 @@ app.post('/api/super-admin/tenants', requireAuth, requireRole(['super_admin']), 
       email || ownerEmail,
       plan || 'enterprise',
       JSON.stringify({ accent: '#38BDF8', invoiceFooter: `Official Invoice — ${name}`, financialYear: '2026-27', language: 'en-IN' }),
-      JSON.stringify({ reminderTime: '09:00', allowNegativeStock: false, maxCashierDiscountPct: 10, stateCode: stateCode || '27' })
+      JSON.stringify({ reminderTime: '09:00', allowNegativeStock: false, maxCashierDiscountPct: 10, stateCode: stateCode || '20' })
     );
     db.prepare(`INSERT INTO branches (id, tenant_id, code, name, address, city, state, state_code, is_headquarters) VALUES (?, ?, 'BR-HQ', ?, ?, ?, ?, ?, 1)`).run(
       branchId,
       tenantId,
       branchName || `${name} HQ`,
       address || 'Main Branch',
-      branchCity || 'Mumbai',
-      branchState || 'Maharashtra',
-      stateCode || '27'
+      branchCity || 'Ranchi',
+      branchState || 'Jharkhand',
+      stateCode || '20'
     );
     db.prepare(`INSERT INTO users (id, tenant_id, branch_id, email, password_hash, full_name, role, pin_code, joining_date) VALUES (?, ?, ?, ?, ?, ?, 'owner', '1234', date('now'))`).run(
       userId,
@@ -543,12 +544,12 @@ app.post('/api/branches', requireAuth, requireRole(['super_admin', 'owner']), (r
     name,
     address || '',
     city,
-    state || 'Maharashtra',
-    stateCode || '27',
+    state || 'Jharkhand',
+    stateCode || '20',
     gstin || '',
     phone || '',
-    Number(lat || 19.076),
-    Number(lng || 72.8777),
+    Number(lat || 23.3441),
+    Number(lng || 85.3096),
     Number(radiusMeters || 300)
   );
   // Initialize 0-qty branch_stock rows for existing tenant products
@@ -558,6 +559,41 @@ app.post('/api/branches', requireAuth, requireRole(['super_admin', 'owner']), (r
 
   logAudit(req.activeTenantId!, id, req.session, 'CREATE_BRANCH', 'branch', id, { name, city }, req.ip);
   res.json({ ok: true, id });
+});
+
+app.patch('/api/branches/:id', requireAuth, requireRole(['super_admin', 'owner']), (req: AuthedRequest, res) => {
+  const tenantId = req.activeTenantId!;
+  const branchId = req.params.id;
+  const { code, name, address, city, state, stateCode, gstin, phone } = req.body;
+  const existing = db.prepare(`SELECT id FROM branches WHERE id = ? AND tenant_id = ?`).get(branchId, tenantId);
+  if (!existing) return res.status(404).json({ error: 'Branch not found for this tenant' });
+
+  db.prepare(`
+    UPDATE branches
+    SET code = COALESCE(?, code),
+        name = COALESCE(?, name),
+        address = COALESCE(?, address),
+        city = COALESCE(?, city),
+        state = COALESCE(?, state),
+        state_code = COALESCE(?, state_code),
+        gstin = COALESCE(?, gstin),
+        phone = COALESCE(?, phone)
+    WHERE id = ? AND tenant_id = ?
+  `).run(
+    code ?? null,
+    name ?? null,
+    address ?? null,
+    city ?? null,
+    state ?? null,
+    stateCode ?? null,
+    gstin ?? null,
+    phone ?? null,
+    branchId,
+    tenantId
+  );
+
+  logAudit(tenantId, branchId, req.session, 'UPDATE_BRANCH', 'branch', branchId, { name, city, address }, req.ip);
+  res.json({ ok: true });
 });
 
 // ================= INVENTORY & STOCK TRANSFERS =================
@@ -2264,6 +2300,16 @@ app.get('/api/security/backup', requireAuth, requireRole(['super_admin', 'owner'
   logAudit(tenantId, null, req.session, 'EXPORT_BACKUP', 'tenant', tenantId, { size: JSON.stringify(backup).length }, req.ip);
   res.setHeader('Content-Disposition', `attachment; filename="titangrid_backup_${tenantId}_${new Date().toISOString().slice(0, 10)}.json"`);
   res.json(backup);
+});
+
+app.get('/api/security/export-source', requireAuth, requireRole(['super_admin', 'owner']), (req: AuthedRequest, res) => {
+  const { buffer, fileCount } = buildCleanSourceZip(process.cwd());
+  logAudit(req.activeTenantId!, null, req.session, 'EXPORT_SOURCE_ZIP', 'system', 'source_bundle', { fileCount, bytes: buffer.length }, req.ip);
+  const filename = `rinku_erp_source_${new Date().toISOString().slice(0, 10)}.zip`;
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('Content-Length', String(buffer.length));
+  res.send(buffer);
 });
 
 // ================= SERVE FRONTEND (VITE DEV OR DIST PROD) =================

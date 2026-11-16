@@ -64,6 +64,21 @@ export async function apiFetch<T = any>(path: string, options: RequestInit = {})
   return res.json() as Promise<T>;
 }
 
+export function triggerBlobDownload(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener noreferrer';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 15000);
+}
+
 export async function apiDownloadFile(path: string, fallbackFilename: string) {
   const token = getStoredToken();
   const tenantOverride = getSuperTenantOverride();
@@ -81,17 +96,12 @@ export async function apiDownloadFile(path: string, fallbackFilename: string) {
     } catch { /* ignore */ }
     throw new Error(errMsg);
   }
-  const blob = await res.blob();
+  const buf = await res.arrayBuffer();
+  const contentType = res.headers.get('Content-Type') || 'application/octet-stream';
+  const blob = new Blob([buf], { type: contentType });
   const disp = res.headers.get('Content-Disposition');
   const match = disp?.match(/filename="?([^";]+)"?/i);
   const filename = match ? match[1] : fallbackFilename;
 
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+  triggerBlobDownload(blob, filename);
 }

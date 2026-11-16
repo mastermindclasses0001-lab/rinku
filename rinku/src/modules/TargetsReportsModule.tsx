@@ -4,16 +4,16 @@ import { useAuth } from '../context/AuthContext';
 import { apiDownloadFile, apiFetch } from '../lib/api';
 
 const EXCEL_REPORTS = [
-  { id: 'stock_valuation', label: 'Branch Stock & Valuation' },
-  { id: 'product_sales_profit', label: 'Product Sales & Gross Profit' },
-  { id: 'gst_gstr1', label: 'GST & GSTR-1 Invoice Register' },
-  { id: 'customer_outstanding', label: 'Customer Dues & Outstanding' },
-  { id: 'staff_attendance', label: 'Staff Attendance Summary' },
-  { id: 'monthly_salary', label: 'Monthly Salary & Deductions' },
-  { id: 'salesman_performance', label: 'Salesman Targets & Commission' },
-  { id: 'daily_sales_expenses', label: 'Cash/UPI Collections & Expenses' },
-  { id: 'stock_movements', label: 'Stock Movement & Transfers' },
-  { id: 'combined_branches', label: 'Combined All-Branch Report' },
+  { id: 'stock_valuation', label: 'Branch Stock & Valuation / स्टॉक मूल्यांकन' },
+  { id: 'product_sales_profit', label: 'Product Sales & Gross Profit / बिक्री व लाभ' },
+  { id: 'gst_gstr1', label: 'GST & GSTR-1 Invoice Register / जीएसटी रजिस्टर' },
+  { id: 'customer_outstanding', label: 'Customer Dues & Outstanding / ग्राहक बकाया' },
+  { id: 'staff_attendance', label: 'Staff Attendance Summary / हाजिरी रिपोर्ट' },
+  { id: 'monthly_salary', label: 'Monthly Salary & Deductions / सैलरी रिपोर्ट' },
+  { id: 'salesman_performance', label: 'Salesman Targets & Commission / सेल्समैन कमीशन' },
+  { id: 'daily_sales_expenses', label: 'Cash/UPI Collections & Expenses / नकद व खर्च' },
+  { id: 'stock_movements', label: 'Stock Movement & Transfers / स्टॉक ट्रांसफर' },
+  { id: 'combined_branches', label: 'Combined All-Shop Report / सभी दुकानों की रिपोर्ट' },
 ];
 
 export const TargetsReportsModule: React.FC = () => {
@@ -72,19 +72,20 @@ export const TargetsReportsModule: React.FC = () => {
             onClick={() => setTab('targets')}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold ${tab === 'targets' ? 'bg-sky-500 text-slate-950' : 'text-slate-500'}`}
           >
-            Staff Targets & Leaderboard
+            Staff Targets & Leaderboard / स्टाफ टारगेट
           </button>
           <button
             onClick={() => setTab('reports')}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold ${tab === 'reports' ? 'bg-sky-500 text-slate-950' : 'text-slate-500'}`}
           >
-            Reports & Excel Download Center
+            Reports & Excel Center / रिपोर्ट व एक्सेल डाउनलोड
           </button>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+          <span className="text-slate-500">From / से:</span>
           <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-          <span className="text-slate-500">to</span>
+          <span className="text-slate-500">To / तक:</span>
           <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
         </div>
       </div>
@@ -92,18 +93,18 @@ export const TargetsReportsModule: React.FC = () => {
       {tab === 'targets' && (
         <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
           <div className="p-4 border-b border-white/10 flex items-center gap-2 font-display font-semibold text-sm">
-            <Trophy className="w-4 h-4 text-amber-400" /> Monthly Salesman Performance & Commission Leaderboard
+            <Trophy className="w-4 h-4 text-amber-400" /> Monthly Salesman Performance & Commission / मासिक सेल्समैन प्रदर्शन व कमीशन
           </div>
           <table className="w-full text-xs">
             <thead className="bg-slate-50 dark:bg-[#171C28] text-slate-500 text-left">
               <tr>
-                <th className="p-3">Rank</th>
-                <th className="p-3">Staff Member</th>
-                <th className="p-3">Branch</th>
-                <th className="p-3 text-right">Monthly Target</th>
-                <th className="p-3 text-right">Achieved (Taxable)</th>
+                <th className="p-3">Rank / रैंक</th>
+                <th className="p-3">Staff Member / कर्मचारी</th>
+                <th className="p-3">Shop / दुकान</th>
+                <th className="p-3 text-right">Monthly Target / लक्ष्य</th>
+                <th className="p-3 text-right">Achieved / बिक्री</th>
                 <th className="p-3 text-right">Achievement %</th>
-                <th className="p-3 text-right">Commission Earned</th>
+                <th className="p-3 text-right">Commission / कमीशन</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -146,7 +147,7 @@ export const TargetsReportsModule: React.FC = () => {
                 </div>
                 <div className="text-xs font-semibold">{r.label}</div>
                 <div className="text-[10px] font-mono text-emerald-400">
-                  {downloading === r.id ? 'GENERATING .XLSX...' : 'EXPORT EXCEL (.XLSX)'}
+                  {downloading === r.id ? 'GENERATING .XLSX... / बन रहा है' : 'EXPORT EXCEL (.XLSX) / डाउनलोड'}
                 </div>
               </button>
             ))}
@@ -156,20 +157,20 @@ export const TargetsReportsModule: React.FC = () => {
           {summary && (
             <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
               <div className="p-4 border-b border-white/10 font-display font-semibold text-sm">
-                Live GST / GSTR-1 Invoice Register Preview ({summary.gstr1.length} Invoices)
+                Live GST / GSTR-1 Invoice Register / लाइव जीएसटी बिल ({summary.gstr1.length} Invoices)
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead className="bg-slate-50 dark:bg-[#171C28] text-slate-500 text-left">
                     <tr>
-                      <th className="p-3">Invoice No</th>
-                      <th className="p-3">Date</th>
-                      <th className="p-3">Customer / GSTIN</th>
-                      <th className="p-3 text-right">Taxable</th>
+                      <th className="p-3">Invoice No / बिल सं.</th>
+                      <th className="p-3">Date / तारीख</th>
+                      <th className="p-3">Customer / ग्राहक व GSTIN</th>
+                      <th className="p-3 text-right">Taxable / कर योग्य</th>
                       <th className="p-3 text-right">CGST</th>
                       <th className="p-3 text-right">SGST</th>
                       <th className="p-3 text-right">IGST</th>
-                      <th className="p-3 text-right">Total</th>
+                      <th className="p-3 text-right">Total / कुल</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-white/5">

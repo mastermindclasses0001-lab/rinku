@@ -11,6 +11,7 @@ import os
 import secrets
 import sys
 import time
+import zipfile
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
@@ -289,9 +290,9 @@ def setup_wizard(body: Dict[str, Any] = Body(...)):
         phone = body.get("phone") or ""
         email = body.get("email") or owner_email
         owner_name = body.get("ownerName") or "Business Owner"
-        branch_city = body.get("branchCity") or "Mumbai"
-        branch_state = body.get("branchState") or "Maharashtra"
-        state_code = body.get("stateCode") or "27"
+        branch_city = body.get("branchCity") or "Ranchi"
+        branch_state = body.get("branchState") or "Jharkhand"
+        state_code = body.get("stateCode") or "20"
 
         conn.execute(
             """
@@ -390,7 +391,7 @@ def create_tenant(body: Dict[str, Any] = Body(...), auth: AuthContext = Depends(
         user_id = uid("usr")
         slug_base = "".join(c if c.isalnum() else "-" for c in str(name).lower()).strip("-")[:30] or "tenant"
         slug = f"{slug_base}-{secrets.token_hex(2)}"
-        state_code = body.get("stateCode") or "27"
+        state_code = body.get("stateCode") or "20"
         plan = body.get("plan") or "enterprise"
 
         conn.execute(
@@ -419,8 +420,8 @@ def create_tenant(body: Dict[str, Any] = Body(...), auth: AuthContext = Depends(
                 tenant_id,
                 body.get("branchName") or f"{name} HQ",
                 body.get("address") or "Main Branch",
-                body.get("branchCity") or "Mumbai",
-                body.get("branchState") or "Maharashtra",
+                body.get("branchCity") or "Ranchi",
+                body.get("branchState") or "Jharkhand",
                 state_code,
             ),
         )
@@ -669,12 +670,12 @@ def create_branch(body: Dict[str, Any] = Body(...), auth: AuthContext = Depends(
                 name,
                 body.get("address") or "",
                 city,
-                body.get("state") or "Maharashtra",
-                body.get("stateCode") or "27",
+                body.get("state") or "Jharkhand",
+                body.get("stateCode") or "20",
                 body.get("gstin") or "",
                 body.get("phone") or "",
-                float(body.get("lat") or 19.076),
-                float(body.get("lng") or 72.8777),
+                float(body.get("lat") or 23.3441),
+                float(body.get("lng") or 85.3096),
                 int(body.get("radiusMeters") or 300),
             ),
         )
@@ -685,6 +686,45 @@ def create_branch(body: Dict[str, Any] = Body(...), auth: AuthContext = Depends(
             )
         log_audit(conn, auth.active_tenant_id, bid, auth.session, "CREATE_BRANCH", "branch", bid, {"name": name, "city": city}, auth.ip)
         return {"ok": True, "id": bid}
+
+
+@app.patch("/api/branches/{branch_id}")
+def update_branch(branch_id: str, body: Dict[str, Any] = Body(...), auth: AuthContext = Depends(require_roles(["super_admin", "owner"]))):
+    with get_db() as conn:
+        existing = conn.execute(
+            "SELECT id FROM branches WHERE id = ? AND tenant_id = ?",
+            (branch_id, auth.active_tenant_id),
+        ).fetchone()
+        if not existing:
+            raise HTTPException(status_code=404, detail="Branch not found for this tenant")
+        conn.execute(
+            """
+            UPDATE branches
+            SET code = COALESCE(?, code),
+                name = COALESCE(?, name),
+                address = COALESCE(?, address),
+                city = COALESCE(?, city),
+                state = COALESCE(?, state),
+                state_code = COALESCE(?, state_code),
+                gstin = COALESCE(?, gstin),
+                phone = COALESCE(?, phone)
+            WHERE id = ? AND tenant_id = ?
+            """,
+            (
+                body.get("code"),
+                body.get("name"),
+                body.get("address"),
+                body.get("city"),
+                body.get("state"),
+                body.get("stateCode"),
+                body.get("gstin"),
+                body.get("phone"),
+                branch_id,
+                auth.active_tenant_id,
+            ),
+        )
+        log_audit(conn, auth.active_tenant_id, branch_id, auth.session, "UPDATE_BRANCH", "branch", branch_id, {"name": body.get("name"), "city": body.get("city")}, auth.ip)
+        return {"ok": True}
 
 
 # ================= INVENTORY & STOCK TRANSFERS =================
@@ -2105,6 +2145,85 @@ def export_backup(auth: AuthContext = Depends(require_roles(["super_admin", "own
             media_type="application/json",
             headers={"Content-Disposition": f'attachment; filename="{fname}"'},
         )
+
+
+@app.get("/api/security/export-source")
+def export_source_zip(auth: AuthContext = Depends(require_roles(["super_admin", "owner"]))):
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if not os.path.exists(os.path.join(base_dir, "package.json")) and os.path.exists(os.path.join(os.getcwd(), "main.py")):
+        base_dir = os.getcwd()
+
+    whitelist_files = {
+        ".env.example",
+        ".gitignore",
+        "BUILD_PROGRESS.md",
+        "MASTER_TODO.md",
+        "bun.lock",
+        "index.html",
+        "metadata.json",
+        "package.json",
+        "server.ts",
+        "tsconfig.json",
+        "vercel.json",
+        "vite.config.ts",
+        "Dockerfile",
+        "main.py",
+        "db.py",
+        "ai_service.py",
+        "excel_export.py",
+        "security.py",
+        "postgres_schema.sql",
+        "requirements.txt",
+    }
+    whitelist_dirs = ["src", "backend", "docs", "scripts", "public"]
+    excluded_dirs = {"node_modules", "dist", "build", "data", "__pycache__", ".git", "coverage"}
+    excluded_exts = (".db", ".db-wal", ".db-shm", ".sqlite", ".sqlite3", ".pyc", ".pyo", ".log")
+
+    buf = io.BytesIO()
+    file_count = 0
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
+        for fname in sorted(whitelist_files):
+            fpath = os.path.join(base_dir, fname)
+            if os.path.isfile(fpath) and not os.path.islink(fpath):
+                zf.write(fpath, arcname=fname)
+                file_count += 1
+
+        for dname in whitelist_dirs:
+            dpath = os.path.join(base_dir, dname)
+            if not os.path.isdir(dpath):
+                continue
+            for root, dirs, files in os.walk(dpath, followlinks=False):
+                rel_root = os.path.relpath(root, base_dir).replace(os.sep, "/")
+                dirs[:] = sorted(
+                    d for d in dirs
+                    if d not in excluded_dirs and f"{rel_root}/{d}" != "public/assets/aistudio"
+                )
+                for fn in sorted(files):
+                    if fn == ".DS_Store" or (fn.startswith(".env") and fn != ".env.example") or fn.lower().endswith(excluded_exts):
+                        continue
+                    full_path = os.path.join(root, fn)
+                    if os.path.islink(full_path) or not os.path.isfile(full_path):
+                        continue
+                    arc_name = f"{rel_root}/{fn}"
+                    zf.write(full_path, arcname=arc_name)
+                    file_count += 1
+
+    if file_count == 0:
+        raise HTTPException(status_code=404, detail="No source files found to package")
+
+    zip_bytes = buf.getvalue()
+    with get_db() as conn:
+        log_audit(conn, auth.active_tenant_id, None, auth.session, "EXPORT_SOURCE_ZIP", "system", "source_bundle", {"fileCount": file_count, "bytes": len(zip_bytes)}, auth.ip)
+
+    out_name = f"rinku_erp_source_{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.zip"
+    return Response(
+        content=zip_bytes,
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f'attachment; filename="{out_name}"',
+            "Content-Length": str(len(zip_bytes)),
+        },
+    )
 
 
 # ================= PRESERVED V1 MICROSERVICE ENDPOINTS =================

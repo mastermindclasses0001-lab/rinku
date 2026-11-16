@@ -94,9 +94,9 @@ export const CrmWhatsappModule: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-4">
         <div className="flex bg-slate-100 dark:bg-[#171C28] p-1 rounded-lg">
           {[
-            { id: 'customers' as const, label: `Customer CRM (${customers.length})` },
-            { id: 'whatsapp' as const, label: 'Meta WhatsApp Automation' },
-            { id: 'complaints' as const, label: `Complaints (${complaints.filter((c) => c.status !== 'resolved').length})` },
+            { id: 'customers' as const, label: `Customers / ग्राहक (${customers.length})` },
+            { id: 'whatsapp' as const, label: 'WhatsApp Automation / व्हाट्सऐप' },
+            { id: 'complaints' as const, label: `Complaints / शिकायतें (${complaints.filter((c) => c.status !== 'resolved').length})` },
           ].map((t) => (
             <button
               key={t.id}
@@ -112,7 +112,7 @@ export const CrmWhatsappModule: React.FC = () => {
           onClick={handleRun9amReminders}
           className="px-3.5 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold text-xs flex items-center gap-1.5"
         >
-          <BellRing className="w-3.5 h-3.5" /> Run 9 AM Overdue Reminders Now
+          <BellRing className="w-3.5 h-3.5" /> Run 9 AM Reminders / उधार रिमाइंडर भेजें
         </button>
       </div>
 
@@ -122,25 +122,31 @@ export const CrmWhatsappModule: React.FC = () => {
           <div className="flex items-center gap-2 text-amber-300">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>
-              <strong>Meta WhatsApp Cloud API: NOT CONFIGURED.</strong> Messages below operate in transparent Demo Simulator mode until Phone Number ID & Access Token are saved in Settings.
+              <strong>Meta WhatsApp Cloud API: NOT CONFIGURED / सेट नहीं है।</strong> Settings में टोकन जोड़ने तक यह डेमो सिम्युलेटर मोड में चलेगा।
             </span>
           </div>
-          <span className="font-mono text-amber-400">DEMO SIMULATOR ACTIVE</span>
+          <span className="font-mono text-amber-400">DEMO SIMULATOR / डेमो मोड</span>
         </div>
       )}
 
       {tab === 'customers' && (
         <div className="space-y-4">
-          <div className="flex gap-1.5">
-            {['all', 'builder', 'contractor', 'architect', 'retail'].map((seg) => (
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { id: 'all', label: 'All / सभी' },
+              { id: 'builder', label: 'Builder / बिल्डर' },
+              { id: 'contractor', label: 'Contractor / ठेकेदार' },
+              { id: 'architect', label: 'Architect / आर्किटेक्ट' },
+              { id: 'retail', label: 'Retail / रिटेल' },
+            ].map((seg) => (
               <button
-                key={seg}
-                onClick={() => setSegmentFilter(seg)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize border ${
-                  segmentFilter === seg ? 'bg-sky-500/15 border-sky-500/40 text-sky-400' : 'border-slate-200 dark:border-white/10 text-slate-500'
+                key={seg.id}
+                onClick={() => setSegmentFilter(seg.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${
+                  segmentFilter === seg.id ? 'bg-sky-500/15 border-sky-500/40 text-sky-400' : 'border-slate-200 dark:border-white/10 text-slate-500'
                 }`}
               >
-                {seg}
+                {seg.label}
               </button>
             ))}
           </div>
@@ -149,13 +155,13 @@ export const CrmWhatsappModule: React.FC = () => {
             <table className="w-full text-xs">
               <thead className="bg-slate-50 dark:bg-[#171C28] border-b border-white/10 text-slate-500 text-left">
                 <tr>
-                  <th className="p-3">Customer / Segment</th>
-                  <th className="p-3">Phone & GSTIN</th>
-                  <th className="p-3 text-right">Credit Limit</th>
-                  <th className="p-3 text-right">Lifetime Sales</th>
-                  <th className="p-3 text-right">Outstanding Due</th>
-                  <th className="p-3">WA Opt-In</th>
-                  <th className="p-3 text-right">1-Click Action</th>
+                  <th className="p-3">Customer / ग्राहक</th>
+                  <th className="p-3">Phone & GSTIN / फोन</th>
+                  <th className="p-3 text-right">Credit Limit / सीमा</th>
+                  <th className="p-3 text-right">Lifetime Sales / कुल खरीद</th>
+                  <th className="p-3 text-right">Outstanding / बकाया</th>
+                  <th className="p-3">WA Opt-In / अनुमति</th>
+                  <th className="p-3 text-right">Action / भुगतान</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -199,10 +205,10 @@ export const CrmWhatsappModule: React.FC = () => {
                           }}
                           className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs inline-flex items-center gap-1"
                         >
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Confirm Payment
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Confirm Payment / जमा करें
                         </button>
                       ) : (
-                        <span className="text-slate-500 font-mono">Settled</span>
+                        <span className="text-slate-500 font-mono">Settled / चुकता</span>
                       )}
                     </td>
                   </tr>
@@ -217,23 +223,23 @@ export const CrmWhatsappModule: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <form onSubmit={handleSendCampaign} className="lg:col-span-5 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-5 space-y-4 text-xs">
             <h3 className="font-display font-bold text-base flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-emerald-400" /> Approved Template Campaign
+              <MessageSquare className="w-4 h-4 text-emerald-400" /> Approved Template Campaign / व्हाट्सऐप कैंपेन
             </h3>
             <div>
-              <label className="block text-slate-400 mb-1">Meta Approved Template Name</label>
+              <label className="block text-slate-400 mb-1">Meta Approved Template Name / टेम्पलेट चुनें</label>
               <select value={templateName} onChange={(e) => setTemplateName(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono">
-                <option value="due_payment_reminder_v1">due_payment_reminder_v1 (Utility)</option>
-                <option value="payment_thank_you_v1">payment_thank_you_v1 (Utility)</option>
-                <option value="invoice_pdf_dispatch_v1">invoice_pdf_dispatch_v1 (Utility)</option>
-                <option value="new_arrival_catalog_v1">new_arrival_catalog_v1 (Marketing - Opt-In Only)</option>
+                <option value="due_payment_reminder_v1">due_payment_reminder_v1 (Utility / उधार याद)</option>
+                <option value="payment_thank_you_v1">payment_thank_you_v1 (Utility / धन्यवाद)</option>
+                <option value="invoice_pdf_dispatch_v1">invoice_pdf_dispatch_v1 (Utility / बिल पीडीएफ)</option>
+                <option value="new_arrival_catalog_v1">new_arrival_catalog_v1 (Marketing / नया स्टॉक)</option>
               </select>
             </div>
             <div>
-              <label className="block text-slate-400 mb-1">Message Body (supports {"{{name}}"})</label>
+              <label className="block text-slate-400 mb-1">Message Body / संदेश लिखें (supports {"{{name}}"})</label>
               <textarea rows={4} value={messageBody} onChange={(e) => setMessageBody(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
             </div>
             <div>
-              <label className="block text-slate-400 mb-1">Recipients ({selectedCustIds.length} Opted-In Selected)</label>
+              <label className="block text-slate-400 mb-1">Recipients / प्राप्तकर्ता ({selectedCustIds.length} Selected)</label>
               <div className="max-h-36 overflow-y-auto space-y-1 border border-white/10 rounded-lg p-2 bg-slate-50 dark:bg-[#171C28]">
                 {customers.map((c) => (
                   <label key={c.id} className="flex items-center justify-between text-xs py-0.5">
@@ -254,13 +260,13 @@ export const CrmWhatsappModule: React.FC = () => {
               </div>
             </div>
             <button type="submit" className="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold flex items-center justify-center gap-1.5">
-              <Send className="w-3.5 h-3.5" /> Dispatch Campaign
+              <Send className="w-3.5 h-3.5" /> Dispatch Campaign / संदेश भेजें
             </button>
           </form>
 
           <div className="lg:col-span-7 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
             <div className="p-4 border-b border-white/10 flex items-center justify-between text-xs">
-              <span className="font-display font-semibold text-sm">WhatsApp Conversation & Delivery Log</span>
+              <span className="font-display font-semibold text-sm">WhatsApp Delivery Log / संदेश लॉग</span>
               <span className="font-mono text-slate-500 truncate max-w-xs">Webhook: {waData.webhookUrl}</span>
             </div>
             <div className="divide-y divide-slate-100 dark:divide-white/5 max-h-[440px] overflow-y-auto">
@@ -290,17 +296,17 @@ export const CrmWhatsappModule: React.FC = () => {
               }}
               className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold text-xs flex items-center gap-1.5"
             >
-              <UserPlus className="w-3.5 h-3.5" /> Log Customer Complaint
+              <UserPlus className="w-3.5 h-3.5" /> Log Complaint / शिकायत दर्ज करें
             </button>
           </div>
           <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
             <table className="w-full text-xs">
               <thead className="bg-slate-50 dark:bg-[#171C28] text-slate-500 text-left">
                 <tr>
-                  <th className="p-3">Customer</th>
-                  <th className="p-3">Subject & Details</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-right">Action</th>
+                  <th className="p-3">Customer / ग्राहक</th>
+                  <th className="p-3">Subject & Details / शिकायत विवरण</th>
+                  <th className="p-3">Status / स्थिति</th>
+                  <th className="p-3 text-right">Action / कार्य</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -322,7 +328,7 @@ export const CrmWhatsappModule: React.FC = () => {
                           }}
                           className="px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-semibold"
                         >
-                          Resolve
+                          Resolve / हल करें
                         </button>
                       )}
                     </td>
@@ -338,18 +344,24 @@ export const CrmWhatsappModule: React.FC = () => {
       {payTarget && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <form onSubmit={handleConfirmPayment} className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-sm w-full p-6 space-y-3 text-xs">
-            <h3 className="font-display font-bold text-base">Confirm Payment & Send Receipt</h3>
-            <p className="text-slate-400">Customer: <strong>{payTarget.name}</strong> (Current Due: {sym}{payTarget.outstanding_balance.toLocaleString()})</p>
-            <input type="number" required min={1} value={payAmount} onChange={(e) => setPayAmount(Number(e.target.value))} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-            <select value={payMode} onChange={(e) => setPayMode(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-              <option value="upi">UPI</option>
-              <option value="cash">Cash</option>
-              <option value="bank_transfer">Bank Transfer / NEFT</option>
-              <option value="card">Card</option>
-            </select>
+            <h3 className="font-display font-bold text-base">Confirm Payment / भुगतान जमा करें</h3>
+            <p className="text-slate-400">Customer / ग्राहक: <strong>{payTarget.name}</strong> (Due / बकाया: {sym}{payTarget.outstanding_balance.toLocaleString()})</p>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Amount Received (₹) / प्राप्त राशि *</label>
+              <input type="number" required min={1} value={payAmount} onChange={(e) => setPayAmount(Number(e.target.value))} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Payment Mode / भुगतान माध्यम</label>
+              <select value={payMode} onChange={(e) => setPayMode(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                <option value="upi">UPI / यूपीआई</option>
+                <option value="cash">Cash / नकद</option>
+                <option value="bank_transfer">Bank Transfer / बैंक</option>
+                <option value="card">Card / कार्ड</option>
+              </select>
+            </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setPayTarget(null)} className="px-3 py-2 rounded-lg border border-white/10">Cancel</button>
-              <button type="submit" className="px-3 py-2 rounded-lg bg-emerald-500 text-slate-950 font-semibold">Verify & Send Thank-You</button>
+              <button type="button" onClick={() => setPayTarget(null)} className="px-3 py-2 rounded-lg border border-white/10">Cancel / रद्द</button>
+              <button type="submit" className="px-3 py-2 rounded-lg bg-emerald-500 text-slate-950 font-semibold">Verify & Send / पुष्टि करें</button>
             </div>
           </form>
         </div>
@@ -368,15 +380,24 @@ export const CrmWhatsappModule: React.FC = () => {
             }}
             className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-md w-full p-6 space-y-3 text-xs"
           >
-            <h3 className="font-display font-bold text-base">Log Customer Complaint</h3>
-            <select value={compForm.customerId} onChange={(e) => setCompForm({ ...compForm, customerId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-              {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-            <input required placeholder="Subject" value={compForm.subject} onChange={(e) => setCompForm({ ...compForm, subject: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-            <textarea required rows={3} placeholder="Issue details..." value={compForm.description} onChange={(e) => setCompForm({ ...compForm, description: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            <h3 className="font-display font-bold text-base">Log Customer Complaint / नई शिकायत दर्ज करें</h3>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Customer / ग्राहक</label>
+              <select value={compForm.customerId} onChange={(e) => setCompForm({ ...compForm, customerId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Subject / शिकायत विषय *</label>
+              <input required placeholder="Subject" value={compForm.subject} onChange={(e) => setCompForm({ ...compForm, subject: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Details / शिकायत का पूरा विवरण *</label>
+              <textarea required rows={3} placeholder="Issue details..." value={compForm.description} onChange={(e) => setCompForm({ ...compForm, description: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            </div>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowComplaintModal(false)} className="px-3 py-2 rounded-lg border border-white/10">Cancel</button>
-              <button type="submit" className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Save Case</button>
+              <button type="button" onClick={() => setShowComplaintModal(false)} className="px-3 py-2 rounded-lg border border-white/10">Cancel / रद्द</button>
+              <button type="submit" className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Save Case / सेव करें</button>
             </div>
           </form>
         </div>

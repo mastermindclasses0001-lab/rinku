@@ -43,8 +43,8 @@ export const AccountsModule: React.FC = () => {
       {/* Financial Summary Strip */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-4">
         <div>
-          <h1 className="font-display text-xl font-bold">Transactional Accounts & Branch P&L</h1>
-          <p className="text-xs text-slate-500">Cash book, UPI/Bank ledgers, operating expenses, and branch-wise cash closing audit.</p>
+          <h1 className="font-display text-xl font-bold">Accounts & Branch P&L / खाता बही और लाभ-हानि</h1>
+          <p className="text-xs text-slate-500">Cash book, UPI/Bank ledgers, operating expenses & cash closing. / नकद, यूपीआई, खर्च और कैश मिलान।</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -54,7 +54,7 @@ export const AccountsModule: React.FC = () => {
             }}
             className="px-3 py-2 rounded-lg border border-white/10 hover:border-sky-500/40 text-xs font-medium"
           >
-            Record Branch Cash Closing
+            Cash Closing / कैश मिलान
           </button>
           <button
             onClick={() => {
@@ -63,7 +63,7 @@ export const AccountsModule: React.FC = () => {
             }}
             className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold text-xs flex items-center gap-1.5"
           >
-            <Plus className="w-3.5 h-3.5" /> Log Expense
+            <Plus className="w-3.5 h-3.5" /> Log Expense / खर्च जोड़ें
           </button>
         </div>
       </div>
@@ -71,19 +71,19 @@ export const AccountsModule: React.FC = () => {
       {/* Mode Totals */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-4">
-          <div className="text-xs text-slate-500">Cash Inflow Ledger</div>
+          <div className="text-xs text-slate-500">Cash Inflow / नकद आय</div>
           <div className="font-mono text-xl font-bold text-emerald-400 mt-1">{sym}{Number(data.totals.cashInflow).toLocaleString()}</div>
         </div>
         <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-4">
-          <div className="text-xs text-slate-500">UPI Collections</div>
+          <div className="text-xs text-slate-500">UPI Collections / यूपीआई आय</div>
           <div className="font-mono text-xl font-bold text-sky-400 mt-1">{sym}{Number(data.totals.upiInflow).toLocaleString()}</div>
         </div>
         <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-4">
-          <div className="text-xs text-slate-500">Bank / Card Transfers</div>
+          <div className="text-xs text-slate-500">Bank / Card / बैंक व कार्ड</div>
           <div className="font-mono text-xl font-bold text-purple-400 mt-1">{sym}{Number(data.totals.bankCardInflow).toLocaleString()}</div>
         </div>
         <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-4">
-          <div className="text-xs text-slate-500">Operating Expenses</div>
+          <div className="text-xs text-slate-500">Operating Expenses / कुल खर्च</div>
           <div className="font-mono text-xl font-bold text-red-400 mt-1">{sym}{Number(data.totals.totalExpenses).toLocaleString()}</div>
         </div>
       </div>
@@ -91,17 +91,17 @@ export const AccountsModule: React.FC = () => {
       {/* Branch-wise Profit & Loss */}
       <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
         <div className="p-4 border-b border-slate-200 dark:border-white/10 font-display font-semibold text-sm flex items-center gap-2">
-          <DollarSign className="w-4 h-4 text-emerald-400" /> Branch-Wise Profit & Loss Statement (Excl. Tax, Net of Discounts & COGS)
+          <DollarSign className="w-4 h-4 text-emerald-400" /> Shop-Wise Profit & Loss / दुकान अनुसार लाभ-हानि
         </div>
         <table className="w-full text-xs">
           <thead className="bg-slate-50 dark:bg-[#171C28] border-b border-white/10 text-slate-500 text-left">
             <tr>
-              <th className="p-3">Branch</th>
-              <th className="p-3 text-right">Taxable Revenue</th>
-              <th className="p-3 text-right">COGS (Purchase Cost)</th>
-              <th className="p-3 text-right">Gross Profit</th>
-              <th className="p-3 text-right">Operating Expenses</th>
-              <th className="p-3 text-right">Net Profit</th>
+              <th className="p-3">Shop / दुकान</th>
+              <th className="p-3 text-right">Revenue / बिक्री</th>
+              <th className="p-3 text-right">COGS / खरीद लागत</th>
+              <th className="p-3 text-right">Gross Profit / सकल लाभ</th>
+              <th className="p-3 text-right">Expenses / खर्च</th>
+              <th className="p-3 text-right">Net Profit / शुद्ध लाभ</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -124,14 +124,14 @@ export const AccountsModule: React.FC = () => {
       {/* Cash Closings & Expenses Split */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-white/10 font-display font-semibold text-sm">Branch Cash Closings & Mismatch Alerts</div>
+          <div className="p-4 border-b border-white/10 font-display font-semibold text-sm">Cash Closings & Mismatch / कैश मिलान</div>
           <table className="w-full text-xs">
             <thead className="bg-slate-50 dark:bg-[#171C28] text-slate-500 text-left">
               <tr>
-                <th className="p-3">Date / Branch</th>
-                <th className="p-3 text-right">Expected</th>
-                <th className="p-3 text-right">Actual</th>
-                <th className="p-3 text-right">Variance</th>
+                <th className="p-3">Date / Shop / दुकान</th>
+                <th className="p-3 text-right">Expected / अपेक्षित</th>
+                <th className="p-3 text-right">Actual / वास्तविक</th>
+                <th className="p-3 text-right">Variance / अंतर</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -153,21 +153,21 @@ export const AccountsModule: React.FC = () => {
                 </tr>
               ))}
               {data.closings.length === 0 && (
-                <tr><td colSpan={4} className="p-6 text-center text-slate-500">No cash closings recorded yet. Click "Record Branch Cash Closing" above.</td></tr>
+                <tr><td colSpan={4} className="p-6 text-center text-slate-500">No cash closings yet. / अभी कोई कैश मिलान दर्ज नहीं।</td></tr>
               )}
             </tbody>
           </table>
         </div>
 
         <div className="bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-white/10 font-display font-semibold text-sm">Recent Expenses Ledger</div>
+          <div className="p-4 border-b border-white/10 font-display font-semibold text-sm">Recent Expenses Ledger / हाल के खर्च</div>
           <table className="w-full text-xs">
             <thead className="bg-slate-50 dark:bg-[#171C28] text-slate-500 text-left">
               <tr>
-                <th className="p-3">Date / Category</th>
-                <th className="p-3">Branch / Vendor</th>
-                <th className="p-3">Mode</th>
-                <th className="p-3 text-right">Amount</th>
+                <th className="p-3">Date / Category / श्रेणी</th>
+                <th className="p-3">Shop / Vendor / दुकान</th>
+                <th className="p-3">Mode / माध्यम</th>
+                <th className="p-3 text-right">Amount / राशि</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -203,24 +203,42 @@ export const AccountsModule: React.FC = () => {
             }}
             className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-md w-full p-6 space-y-3 text-xs"
           >
-            <h3 className="font-display font-bold text-base">Record Business Expense</h3>
-            <select value={expForm.branchId} onChange={(e) => setExpForm({ ...expForm, branchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-              {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
-            <input required placeholder="Category (e.g. Freight, Electricity, Rent)" value={expForm.category} onChange={(e) => setExpForm({ ...expForm, category: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-            <input required placeholder="Description" value={expForm.description} onChange={(e) => setExpForm({ ...expForm, description: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-            <div className="grid grid-cols-2 gap-2">
-              <input type="number" required min={1} placeholder="Amount" value={expForm.amount || ''} onChange={(e) => setExpForm({ ...expForm, amount: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <select value={expForm.paymentMode} onChange={(e) => setExpForm({ ...expForm, paymentMode: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                <option value="cash">Cash</option>
-                <option value="upi">UPI</option>
-                <option value="bank_transfer">Bank Transfer</option>
+            <h3 className="font-display font-bold text-base">Record Expense / खर्च दर्ज करें</h3>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Shop / दुकान</label>
+              <select value={expForm.branchId} onChange={(e) => setExpForm({ ...expForm, branchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             </div>
-            <input placeholder="Vendor Name" value={expForm.vendorName} onChange={(e) => setExpForm({ ...expForm, vendorName: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Category / श्रेणी (Freight, Rent)</label>
+              <input required placeholder="Logistics & Freight" value={expForm.category} onChange={(e) => setExpForm({ ...expForm, category: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Description / विवरण</label>
+              <input required placeholder="Details" value={expForm.description} onChange={(e) => setExpForm({ ...expForm, description: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Amount (₹) / राशि</label>
+                <input type="number" required min={1} placeholder="500" value={expForm.amount || ''} onChange={(e) => setExpForm({ ...expForm, amount: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Payment Mode / माध्यम</label>
+                <select value={expForm.paymentMode} onChange={(e) => setExpForm({ ...expForm, paymentMode: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  <option value="cash">Cash / नकद</option>
+                  <option value="upi">UPI / यूपीआई</option>
+                  <option value="bank_transfer">Bank Transfer / बैंक</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Vendor Name / किसको दिया</label>
+              <input placeholder="Vendor / Party Name" value={expForm.vendorName} onChange={(e) => setExpForm({ ...expForm, vendorName: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setShowExpModal(false)} className="px-3 py-2 rounded-lg border border-white/10">Cancel</button>
-              <button type="submit" className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Save Expense</button>
+              <button type="button" onClick={() => setShowExpModal(false)} className="px-3 py-2 rounded-lg border border-white/10">Cancel / रद्द</button>
+              <button type="submit" className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Save / सेव करें</button>
             </div>
           </form>
         </div>
@@ -246,22 +264,28 @@ export const AccountsModule: React.FC = () => {
             }}
             className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-sm w-full p-6 space-y-3 text-xs"
           >
-            <h3 className="font-display font-bold text-base">Daily Branch Cash Closing</h3>
-            <select value={closeForm.branchId} onChange={(e) => setCloseForm({ ...closeForm, branchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-              {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
+            <h3 className="font-display font-bold text-base">Daily Cash Closing / दैनिक गल्ला मिलान</h3>
             <div>
-              <label className="block text-slate-400 mb-1">Opening Drawer Cash</label>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Shop / दुकान</label>
+              <select value={closeForm.branchId} onChange={(e) => setCloseForm({ ...closeForm, branchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Opening Drawer Cash / शुरुआती नकद</label>
               <input type="number" value={closeForm.openingCash} onChange={(e) => setCloseForm({ ...closeForm, openingCash: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
             </div>
             <div>
-              <label className="block text-slate-400 mb-1">Physical Counted Cash</label>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Physical Counted Cash / गिने हुए नकद</label>
               <input type="number" value={closeForm.actualCash} onChange={(e) => setCloseForm({ ...closeForm, actualCash: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
             </div>
-            <input placeholder="Closing Notes" value={closeForm.notes} onChange={(e) => setCloseForm({ ...closeForm, notes: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Closing Notes / नोट्स</label>
+              <input placeholder="Closing Notes / नोट्स" value={closeForm.notes} onChange={(e) => setCloseForm({ ...closeForm, notes: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setShowClosingModal(false)} className="px-3 py-2 rounded-lg border border-white/10">Cancel</button>
-              <button type="submit" className="px-3 py-2 rounded-lg bg-emerald-500 text-slate-950 font-semibold">Close Drawer</button>
+              <button type="button" onClick={() => setShowClosingModal(false)} className="px-3 py-2 rounded-lg border border-white/10">Cancel / रद्द</button>
+              <button type="submit" className="px-3 py-2 rounded-lg bg-emerald-500 text-slate-950 font-semibold">Close Drawer / बंद करें</button>
             </div>
           </form>
         </div>

@@ -218,10 +218,10 @@ export const AttendanceStaffModule: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-4">
         <div className="flex flex-wrap gap-1.5 bg-slate-100 dark:bg-[#171C28] p-1 rounded-lg">
           {[
-            { id: 'camera' as const, label: 'Mobile Face Terminal' },
-            { id: 'logs' as const, label: `Attendance Log (${logs.length})` },
-            { id: 'employees' as const, label: `Staff Directory (${employees.length})` },
-            { id: 'payroll' as const, label: 'Payroll & Salary Slips' },
+            { id: 'camera' as const, label: 'Mobile Face Terminal / फेस हाजिरी' },
+            { id: 'logs' as const, label: `Attendance Log / हाजिरी लॉग (${logs.length})` },
+            { id: 'employees' as const, label: `Staff Directory / स्टाफ सूची (${employees.length})` },
+            { id: 'payroll' as const, label: 'Payroll & Salary Slips / वेतन व स्लिप' },
           ].map((t) => (
             <button
               key={t.id}
@@ -237,7 +237,7 @@ export const AttendanceStaffModule: React.FC = () => {
             onClick={() => setShowAddEmp(true)}
             className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold text-xs flex items-center gap-1.5"
           >
-            <UserPlus className="w-3.5 h-3.5" /> Register Employee
+            <UserPlus className="w-3.5 h-3.5" /> Register Employee / नया स्टाफ जोड़ें
           </button>
         )}
       </div>
@@ -248,8 +248,8 @@ export const AttendanceStaffModule: React.FC = () => {
           <div className="lg:col-span-6 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-display font-bold text-base">Biometric Face + Liveness Terminal</h2>
-                <p className="text-xs text-slate-500">Multi-frame motion & luminance check verified server-side against encrypted embedding.</p>
+                <h2 className="font-display font-bold text-base">Biometric Face + Liveness Terminal / बायोमेट्रिक फेस हाजिरी</h2>
+                <p className="text-xs text-slate-500">Multi-frame motion & luminance check verified server-side. / लाइव चेहरे की जांच से सुरक्षित हाजिरी।</p>
               </div>
               <ShieldCheck className="w-5 h-5 text-emerald-400" />
             </div>
@@ -260,10 +260,10 @@ export const AttendanceStaffModule: React.FC = () => {
                 <div className="text-center p-6 space-y-3">
                   <Camera className="w-10 h-10 text-slate-500 mx-auto" />
                   <div className="text-xs text-slate-400 max-w-xs mx-auto">
-                    {cameraError || 'Activate front camera to verify live presence or enroll employee face vector.'}
+                    {cameraError || 'Activate front camera to verify live presence or enroll employee face vector. / हाजिरी या चेहरा रजिस्टर करने के लिए कैमरा चालू करें।'}
                   </div>
                   <button onClick={startCamera} className="px-4 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold text-xs">
-                    Start Camera Feed
+                    Start Camera Feed / कैमरा चालू करें
                   </button>
                 </div>
               )}
@@ -276,11 +276,11 @@ export const AttendanceStaffModule: React.FC = () => {
                 className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 hover:border-sky-500/40 flex items-center gap-1.5"
               >
                 <MapPin className="w-3.5 h-3.5 text-emerald-400" />
-                {coords ? `GPS: ${coords.lat}, ${coords.lng}` : 'Verify Branch GPS Geofence'}
+                {coords ? `GPS: ${coords.lat}, ${coords.lng}` : 'Verify Branch GPS / लोकेशन जांचें'}
               </button>
               <label className="flex items-center gap-2 text-slate-400">
                 <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-                <span>Employee Biometric Consent</span>
+                <span>Employee Biometric Consent / बायोमेट्रिक सहमति</span>
               </label>
             </div>
           </div>
@@ -289,7 +289,7 @@ export const AttendanceStaffModule: React.FC = () => {
           <div className="lg:col-span-6 bg-white dark:bg-[#11151E] border border-slate-200 dark:border-white/10 rounded-xl p-5 space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="block text-slate-400 mb-1">Employee</label>
+                <label className="block text-slate-400 mb-1">Employee / कर्मचारी</label>
                 <select
                   value={selectedUserId}
                   onChange={(e) => setSelectedUserId(e.target.value)}
@@ -297,13 +297,13 @@ export const AttendanceStaffModule: React.FC = () => {
                 >
                   {employees.map((e) => (
                     <option key={e.id} value={e.id}>
-                      {e.full_name} ({e.face_enrolled ? 'Face Enrolled' : 'PIN Only'})
+                      {e.full_name} ({e.face_enrolled ? 'Face Enrolled / रजिस्टर्ड' : 'PIN Only / पिन'})
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-slate-400 mb-1">Branch Location</label>
+                <label className="block text-slate-400 mb-1">Shop Location / दुकान</label>
                 <select
                   value={selectedBranchId}
                   onChange={(e) => setSelectedBranchId(e.target.value)}
@@ -322,14 +322,14 @@ export const AttendanceStaffModule: React.FC = () => {
                 onClick={() => handleAttendanceCheck('IN', 'face_liveness')}
                 className="min-h-[48px] rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm disabled:opacity-40 transition-colors"
               >
-                Face Check IN
+                Face Check IN / फेस इन
               </button>
               <button
                 disabled={!cameraActive || processing}
                 onClick={() => handleAttendanceCheck('OUT', 'face_liveness')}
                 className="min-h-[48px] rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-sm disabled:opacity-40 transition-colors"
               >
-                Face Check OUT
+                Face Check OUT / फेस आउट
               </button>
             </div>
 
@@ -338,13 +338,13 @@ export const AttendanceStaffModule: React.FC = () => {
               onClick={handleEnrollFace}
               className="w-full py-2.5 rounded-lg border border-sky-500/40 text-sky-400 hover:bg-sky-500/10 text-xs font-semibold disabled:opacity-40"
             >
-              Enroll / Update Face Biometric Vector (Requires Consent)
+              Enroll / Update Face / चेहरा रजिस्टर करें (Consent Required)
             </button>
 
             <div className="pt-4 border-t border-slate-200 dark:border-white/10 space-y-3">
               <div className="flex items-center gap-2 text-xs font-semibold">
                 <KeyRound className="w-4 h-4 text-purple-400" />
-                <span>PIN Fallback (When Camera Unavailable)</span>
+                <span>PIN Fallback / पिन से हाजिरी (कैमरा न होने पर)</span>
               </div>
               <div className="flex gap-2">
                 <input
@@ -352,7 +352,7 @@ export const AttendanceStaffModule: React.FC = () => {
                   maxLength={6}
                   value={pinCode}
                   onChange={(e) => setPinCode(e.target.value)}
-                  placeholder="Enter 4-digit PIN (e.g. 4821)"
+                  placeholder="4-digit PIN / 4 अंक पिन (e.g. 4821)"
                   className="flex-1 px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 text-xs font-mono"
                 />
                 <button
@@ -360,14 +360,14 @@ export const AttendanceStaffModule: React.FC = () => {
                   onClick={() => handleAttendanceCheck('IN', 'pin_fallback')}
                   className="px-4 py-2.5 rounded-lg bg-purple-500 hover:bg-purple-400 text-slate-950 font-semibold text-xs disabled:opacity-40"
                 >
-                  PIN IN
+                  PIN IN / पिन इन
                 </button>
                 <button
                   disabled={!pinCode || processing}
                   onClick={() => handleAttendanceCheck('OUT', 'pin_fallback')}
                   className="px-4 py-2.5 rounded-lg border border-purple-500/40 text-purple-400 font-semibold text-xs disabled:opacity-40"
                 >
-                  PIN OUT
+                  PIN OUT / पिन आउट
                 </button>
               </div>
             </div>
@@ -380,14 +380,14 @@ export const AttendanceStaffModule: React.FC = () => {
           <table className="w-full text-xs">
             <thead className="bg-slate-50 dark:bg-[#171C28] border-b border-white/10 text-slate-500 text-left">
               <tr>
-                <th className="p-3">Date</th>
-                <th className="p-3">Employee</th>
-                <th className="p-3">Branch</th>
+                <th className="p-3">Date / तारीख</th>
+                <th className="p-3">Employee / कर्मचारी</th>
+                <th className="p-3">Shop / दुकान</th>
                 <th className="p-3">IN / OUT</th>
-                <th className="p-3">Method & Liveness</th>
-                <th className="p-3">Geofence</th>
-                <th className="p-3">Status</th>
-                <th className="p-3 text-right">Correction</th>
+                <th className="p-3">Method / तरीका</th>
+                <th className="p-3">Geofence / लोकेशन</th>
+                <th className="p-3">Status / स्थिति</th>
+                <th className="p-3 text-right">Correction / सुधार</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -401,7 +401,7 @@ export const AttendanceStaffModule: React.FC = () => {
                     {l.method} {l.liveness_score > 0 ? `(Live ${(l.liveness_score * 100).toFixed(0)}%)` : ''}
                   </td>
                   <td className="p-3">
-                    {l.geofence_ok ? <span className="text-emerald-400 inline-flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Inside</span> : <span className="text-red-400 inline-flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> Outside</span>}
+                    {l.geofence_ok ? <span className="text-emerald-400 inline-flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Inside / अंदर</span> : <span className="text-red-400 inline-flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> Outside / बाहर</span>}
                   </td>
                   <td className="p-3 font-mono uppercase">{l.status}</td>
                   <td className="p-3 text-right">
@@ -417,7 +417,7 @@ export const AttendanceStaffModule: React.FC = () => {
                         }}
                         className="px-2 py-1 rounded border border-white/10 hover:border-sky-500/40 text-[11px]"
                       >
-                        Approve / Fix
+                        Approve / सुधारें
                       </button>
                     )}
                   </td>
@@ -433,12 +433,12 @@ export const AttendanceStaffModule: React.FC = () => {
           <table className="w-full text-xs">
             <thead className="bg-slate-50 dark:bg-[#171C28] border-b border-white/10 text-slate-500 text-left">
               <tr>
-                <th className="p-3">Employee</th>
-                <th className="p-3">Role & Branch</th>
-                <th className="p-3">Phone</th>
-                <th className="p-3 text-right">Monthly Salary</th>
-                <th className="p-3 text-right">Sales Target</th>
-                <th className="p-3">Face Biometric</th>
+                <th className="p-3">Employee / कर्मचारी</th>
+                <th className="p-3">Role & Shop / पद व दुकान</th>
+                <th className="p-3">Phone / फ़ोन</th>
+                <th className="p-3 text-right">Monthly Salary / मासिक वेतन</th>
+                <th className="p-3 text-right">Sales Target / बिक्री लक्ष्य</th>
+                <th className="p-3">Face Biometric / फेस</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -452,7 +452,7 @@ export const AttendanceStaffModule: React.FC = () => {
                   <td className="p-3 font-mono">{e.phone}</td>
                   <td className="p-3 text-right font-mono">{sym}{Number(e.salary_monthly).toLocaleString()}</td>
                   <td className="p-3 text-right font-mono">{sym}{Number(e.monthly_target).toLocaleString()}</td>
-                  <td className="p-3 font-mono">{e.face_enrolled ? <span className="text-emerald-400">ENROLLED</span> : <span className="text-amber-400">PENDING</span>}</td>
+                  <td className="p-3 font-mono">{e.face_enrolled ? <span className="text-emerald-400">ENROLLED / दर्ज</span> : <span className="text-amber-400">PENDING / बाकी</span>}</td>
                 </tr>
               ))}
             </tbody>
@@ -465,13 +465,13 @@ export const AttendanceStaffModule: React.FC = () => {
           <table className="w-full text-xs">
             <thead className="bg-slate-50 dark:bg-[#171C28] border-b border-white/10 text-slate-500 text-left">
               <tr>
-                <th className="p-3">Employee</th>
-                <th className="p-3 text-right">Base Salary</th>
-                <th className="p-3 text-right">Present / Late</th>
-                <th className="p-3 text-right">Overtime Pay</th>
-                <th className="p-3 text-right">Advances / Ded.</th>
-                <th className="p-3 text-right">Net Payable</th>
-                <th className="p-3 text-right">Actions</th>
+                <th className="p-3">Employee / कर्मचारी</th>
+                <th className="p-3 text-right">Base Salary / मूल वेतन</th>
+                <th className="p-3 text-right">Present / Late (दिन)</th>
+                <th className="p-3 text-right">Overtime / ओवरटाइम</th>
+                <th className="p-3 text-right">Advance / कटौती</th>
+                <th className="p-3 text-right">Net Payable / कुल देय</th>
+                <th className="p-3 text-right">Actions / विकल्प</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -488,13 +488,13 @@ export const AttendanceStaffModule: React.FC = () => {
                   <td className="p-3 text-right font-mono font-bold text-sky-400">{sym}{p.net_salary.toLocaleString()}</td>
                   <td className="p-3 text-right space-x-1.5">
                     <button onClick={() => setAdjUser(p)} className="px-2 py-1 rounded border border-white/10 hover:border-sky-500/40">
-                      + Advance/Bonus
+                      + Advance / एडवांस
                     </button>
                     <button
                       onClick={() => tenant && generateSalarySlipPdf(p, tenant)}
                       className="px-2 py-1 rounded bg-sky-500/15 text-sky-400 inline-flex items-center gap-1"
                     >
-                      <FileDown className="w-3.5 h-3.5" /> Slip PDF
+                      <FileDown className="w-3.5 h-3.5" /> Slip PDF / स्लिप
                     </button>
                   </td>
                 </tr>
@@ -515,29 +515,63 @@ export const AttendanceStaffModule: React.FC = () => {
               setShowAddEmp(false);
               loadAll();
             }}
-            className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-md w-full p-6 space-y-3 text-xs"
+            className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-md w-full p-6 space-y-3 text-xs max-h-[90vh] overflow-y-auto"
           >
-            <h3 className="font-display font-bold text-base">Register Staff Member</h3>
-            <input required placeholder="Full Name *" value={empForm.fullName} onChange={(e) => setEmpForm({ ...empForm, fullName: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-            <input required type="email" placeholder="Work Email *" value={empForm.email} onChange={(e) => setEmpForm({ ...empForm, email: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            <h3 className="font-display font-bold text-base">Register Staff Member / नया स्टाफ जोड़ें</h3>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Full Name / पूरा नाम *</label>
+              <input required placeholder="e.g. Amit Mahato" value={empForm.fullName} onChange={(e) => setEmpForm({ ...empForm, fullName: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            </div>
             <div className="grid grid-cols-2 gap-2">
-              <select value={empForm.role} onChange={(e) => setEmpForm({ ...empForm, role: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                <option value="salesman">Salesman</option>
-                <option value="cashier">Cashier</option>
-                <option value="branch_manager">Branch Manager</option>
-                <option value="accountant">Accountant</option>
-              </select>
-              <select value={empForm.branchId} onChange={(e) => setEmpForm({ ...empForm, branchId: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-                {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
-              <input placeholder="Mobile" value={empForm.phone} onChange={(e) => setEmpForm({ ...empForm, phone: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
-              <input placeholder="4-digit PIN" value={empForm.pinCode} onChange={(e) => setEmpForm({ ...empForm, pinCode: e.target.value })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input type="number" placeholder="Monthly Salary" value={empForm.salaryMonthly} onChange={(e) => setEmpForm({ ...empForm, salaryMonthly: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-              <input type="number" placeholder="Sales Target" value={empForm.monthlyTarget} onChange={(e) => setEmpForm({ ...empForm, monthlyTarget: Number(e.target.value) })} className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Work Email / कार्य ईमेल *</label>
+                <input required type="email" placeholder="staff@shop.in" value={empForm.email} onChange={(e) => setEmpForm({ ...empForm, email: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Login Password / लॉगिन पासवर्ड *</label>
+                <input required type="text" placeholder="Staff@123" value={empForm.password} onChange={(e) => setEmpForm({ ...empForm, password: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Staff Role / पद</label>
+                <select value={empForm.role} onChange={(e) => setEmpForm({ ...empForm, role: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  <option value="salesman">Salesman / सेल्समैन</option>
+                  <option value="cashier">Cashier / कैशियर</option>
+                  <option value="branch_manager">Branch Manager / प्रबंधक</option>
+                  <option value="accountant">Accountant / मुनीम</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Assigned Shop / दुकान</label>
+                <select value={empForm.branchId} onChange={(e) => setEmpForm({ ...empForm, branchId: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                  {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Mobile Number / मोबाइल</label>
+                <input placeholder="+91 98..." value={empForm.phone} onChange={(e) => setEmpForm({ ...empForm, phone: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Attendance PIN / 4-अंक पिन</label>
+                <input placeholder="1234" value={empForm.pinCode} onChange={(e) => setEmpForm({ ...empForm, pinCode: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Monthly Salary (₹) / मासिक वेतन</label>
+                <input type="number" placeholder="24000" value={empForm.salaryMonthly} onChange={(e) => setEmpForm({ ...empForm, salaryMonthly: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Sales Target (₹) / मासिक लक्ष्य</label>
+                <input type="number" placeholder="400000" value={empForm.monthlyTarget} onChange={(e) => setEmpForm({ ...empForm, monthlyTarget: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-[11px] font-medium text-slate-400 mb-1">Commission (%) / बिक्री कमीशन %</label>
+                <input type="number" step="0.1" placeholder="2.0" value={empForm.commissionRate} onChange={(e) => setEmpForm({ ...empForm, commissionRate: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+              </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setShowAddEmp(false)} className="px-3 py-2 rounded-lg border border-white/10">Cancel</button>
-              <button type="submit" className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Save Employee</button>
+              <button type="button" onClick={() => setShowAddEmp(false)} className="px-3 py-2 rounded-lg border border-white/10">Cancel / रद्द</button>
+              <button type="submit" className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Save Employee / सेव करें</button>
             </div>
           </form>
         </div>
@@ -559,18 +593,27 @@ export const AttendanceStaffModule: React.FC = () => {
             }}
             className="bg-white dark:bg-[#11151E] border border-white/10 rounded-xl max-w-sm w-full p-5 space-y-3 text-xs"
           >
-            <h3 className="font-display font-bold">Salary Adjustment — {adjUser.full_name}</h3>
-            <select value={adjForm.type} onChange={(e) => setAdjForm({ ...adjForm, type: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
-              <option value="advance">Salary Advance (Deduct)</option>
-              <option value="loan">Staff Loan Installment (Deduct)</option>
-              <option value="deduction">Absence / Penalty Deduction</option>
-              <option value="bonus">Incentive / Bonus (Add)</option>
-            </select>
-            <input type="number" required value={adjForm.amount} onChange={(e) => setAdjForm({ ...adjForm, amount: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
-            <input placeholder="Notes" value={adjForm.notes} onChange={(e) => setAdjForm({ ...adjForm, notes: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            <h3 className="font-display font-bold">Salary Adjustment / वेतन समायोजन — {adjUser.full_name}</h3>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Adjustment Type / प्रकार</label>
+              <select value={adjForm.type} onChange={(e) => setAdjForm({ ...adjForm, type: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10">
+                <option value="advance">Salary Advance / वेतन एडवांस (Deduct)</option>
+                <option value="loan">Staff Loan Installment / ऋण किस्त (Deduct)</option>
+                <option value="deduction">Absence / Penalty / जुर्माना (Deduct)</option>
+                <option value="bonus">Incentive / Bonus / बोनस (Add)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Amount (₹) / राशि</label>
+              <input type="number" required value={adjForm.amount} onChange={(e) => setAdjForm({ ...adjForm, amount: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10 font-mono" />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">Notes / विवरण</label>
+              <input placeholder="Reason / विवरण" value={adjForm.notes} onChange={(e) => setAdjForm({ ...adjForm, notes: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#171C28] border border-white/10" />
+            </div>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setAdjUser(null)} className="px-3 py-2 rounded-lg border border-white/10">Cancel</button>
-              <button type="submit" className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Record</button>
+              <button type="button" onClick={() => setAdjUser(null)} className="px-3 py-2 rounded-lg border border-white/10">Cancel / रद्द</button>
+              <button type="submit" className="px-3 py-2 rounded-lg bg-sky-500 text-slate-950 font-semibold">Record / दर्ज करें</button>
             </div>
           </form>
         </div>

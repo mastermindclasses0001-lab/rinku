@@ -29,16 +29,16 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'dashboard', label: 'Owner Dashboard', icon: LayoutDashboard },
-  { id: 'pos', label: 'POS Billing', icon: ShoppingCart },
-  { id: 'inventory', label: 'Branches & Stock', icon: Boxes },
-  { id: 'accounts', label: 'Accounts & P&L', icon: Landmark, roles: ['super_admin', 'owner', 'branch_manager', 'accountant'] },
-  { id: 'crm', label: 'CRM & WhatsApp', icon: Users },
-  { id: 'staff', label: 'Staff & Attendance', icon: UserCheck },
-  { id: 'ai_brain', label: 'AI Brain', icon: BrainCircuit },
-  { id: 'reports', label: 'Targets & Reports', icon: FileSpreadsheet, roles: ['super_admin', 'owner', 'branch_manager', 'accountant'] },
-  { id: 'settings', label: 'Settings & Vault', icon: Settings, roles: ['super_admin', 'owner'] },
-  { id: 'super_admin', label: 'Super Admin', icon: Shield, roles: ['super_admin'] },
+  { id: 'dashboard', label: 'Dashboard / डैशबोर्ड', icon: LayoutDashboard },
+  { id: 'pos', label: 'POS Billing / बिलिंग', icon: ShoppingCart },
+  { id: 'inventory', label: 'Branches & Stock / स्टॉक', icon: Boxes },
+  { id: 'accounts', label: 'Accounts & P&L / खाता', icon: Landmark, roles: ['super_admin', 'owner', 'branch_manager', 'accountant'] },
+  { id: 'crm', label: 'CRM & WhatsApp / ग्राहक', icon: Users },
+  { id: 'staff', label: 'Staff & Attend. / हाजिरी', icon: UserCheck },
+  { id: 'ai_brain', label: 'AI Brain / एआई मदद', icon: BrainCircuit },
+  { id: 'reports', label: 'Reports / रिपोर्ट व टारगेट', icon: FileSpreadsheet, roles: ['super_admin', 'owner', 'branch_manager', 'accountant'] },
+  { id: 'settings', label: 'Settings / सेटिंग्स', icon: Settings, roles: ['super_admin', 'owner'] },
+  { id: 'super_admin', label: 'Super Admin / एडमिन', icon: Shield, roles: ['super_admin'] },
 ];
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -59,7 +59,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="min-w-0">
             <div className="font-display text-sm font-bold truncate">{tenant?.name || 'TitanGrid ERP'}</div>
             <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">
-              {tenant?.is_demo ? 'DEMO TENANT DATA' : 'LIVE PRODUCTION'}
+              {tenant?.is_demo ? 'DEMO DATA / डेमो डेटा' : 'LIVE / लाइव सिस्टम'}
             </div>
           </div>
         </div>
@@ -97,7 +97,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors"
           >
             <LogOut className="w-4 h-4" />
-            <span>Sign Out</span>
+            <span>Sign Out / लॉग आउट</span>
           </button>
         </div>
       </aside>
@@ -130,9 +130,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               <select
                 value={activeBranchId}
                 onChange={(e) => setActiveBranchId(e.target.value)}
-                className="bg-transparent text-xs font-medium focus:outline-none max-w-[150px] truncate"
+                className="bg-transparent text-xs font-medium focus:outline-none max-w-[190px] truncate"
               >
-                <option value="all" className="bg-white dark:bg-[#11151E]">All Branches ({branches.length})</option>
+                <option value="all" className="bg-white dark:bg-[#11151E]">All Shops / सभी दुकानें ({branches.length})</option>
                 {branches.map((b) => (
                   <option key={b.id} value={b.id} className="bg-white dark:bg-[#11151E]">
                     {b.name} ({b.code})
@@ -143,7 +143,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
             {tenant?.is_demo === 1 && (
               <span className="hidden md:inline-block text-[11px] font-mono text-amber-400 border border-amber-500/30 bg-amber-500/10 px-2 py-1 rounded">
-                DEMO DATA
+                DEMO DATA / डेमो
               </span>
             )}
 
@@ -164,11 +164,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Mobile Bottom Thumb-Zone Navigation (<= 15% height, >=44px targets) */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 h-16 bg-white/95 dark:bg-[#0D1017]/95 backdrop-blur-md border-t border-slate-200 dark:border-white/10 grid grid-cols-5 items-center px-1">
         {[
-          { id: 'dashboard' as NavSection, label: 'Home', icon: LayoutDashboard },
-          { id: 'pos' as NavSection, label: 'POS', icon: ShoppingCart },
-          { id: 'inventory' as NavSection, label: 'Stock', icon: Boxes },
-          { id: 'staff' as NavSection, label: 'Attend', icon: UserCheck },
-          { id: 'crm' as NavSection, label: 'Dues', icon: Users },
+          { id: 'dashboard' as NavSection, label: 'Home / होम', icon: LayoutDashboard },
+          { id: 'pos' as NavSection, label: 'POS / बिल', icon: ShoppingCart },
+          { id: 'inventory' as NavSection, label: 'Stock / स्टॉक', icon: Boxes },
+          { id: 'staff' as NavSection, label: 'Attend / हाजिरी', icon: UserCheck },
+          { id: 'crm' as NavSection, label: 'Dues / उधार', icon: Users },
         ].map((item) => {
           const Icon = item.icon;
           const active = activeSection === item.id;
@@ -219,7 +219,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             </div>
             <button onClick={logout} className="min-h-[44px] flex items-center gap-2 px-3 text-sm text-red-400 font-medium">
               <LogOut className="w-4 h-4" />
-              <span>Sign Out</span>
+              <span>Sign Out / लॉग आउट</span>
             </button>
           </div>
           <div className="flex-1" onClick={() => setMobileMenuOpen(false)} />

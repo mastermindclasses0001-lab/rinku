@@ -18,7 +18,7 @@ const ErpRouter: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#090B10] text-slate-300 flex items-center justify-center text-sm font-mono">
-        Loading TitanGrid Retail ERP Workspace...
+        Loading TitanGrid Retail ERP Workspace... / ईआरपी लोड हो रहा है...
       </div>
     );
   }
