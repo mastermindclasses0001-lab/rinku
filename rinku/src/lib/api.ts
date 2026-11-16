@@ -1,6 +1,26 @@
 const TOKEN_KEY = 'titangrid_token';
 const TENANT_OVERRIDE_KEY = 'titangrid_super_tenant';
 
+const DEFAULT_RENDER_API = 'https://titangrid-backend.onrender.com';
+
+export function getApiBaseUrl(): string {
+  const configured = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
+  if (configured) {
+    return configured.replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined' && window.location.hostname.endsWith('.vercel.app')) {
+    return DEFAULT_RENDER_API;
+  }
+  return '';
+}
+
+export function resolveApiUrl(path: string): string {
+  if (/^https?:\/\//i.test(path)) return path;
+  const base = getApiBaseUrl();
+  if (!base) return path;
+  return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
 export function getStoredToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
@@ -29,12 +49,15 @@ export async function apiFetch<T = any>(path: string, options: RequestInit = {})
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (tenantOverride) headers['x-tenant-id'] = tenantOverride;
 
-  const res = await fetch(path, { ...options, headers });
+  const res = await fetch(resolveApiUrl(path), { ...options, headers });
   if (!res.ok) {
     let errMsg = `Request failed (${res.status})`;
     try {
       const data = await res.json();
-      if (data?.error) errMsg = data.error;
+      if (data?.error) errMsg = String(data.error);
+      else if (data?.detail) {
+        errMsg = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+      }
     } catch { /* ignore */ }
     throw new Error(errMsg);
   }
@@ -48,13 +71,19 @@ export async function apiDownloadFile(path: string, fallbackFilename: string) {
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (tenantOverride) headers['x-tenant-id'] = tenantOverride;
 
-  const res = await fetch(path, { headers });
+  const res = await fetch(resolveApiUrl(path), { headers });
   if (!res.ok) {
-    throw new Error(`Export failed (${res.status})`);
+    let errMsg = `Export failed (${res.status})`;
+    try {
+      const data = await res.json();
+      if (data?.error) errMsg = String(data.error);
+      else if (data?.detail) errMsg = String(data.detail);
+    } catch { /* ignore */ }
+    throw new Error(errMsg);
   }
   const blob = await res.blob();
   const disp = res.headers.get('Content-Disposition');
-  const match = disp?.match(/filename="([^"]+)"/);
+  const match = disp?.match(/filename="?([^";]+)"?/i);
   const filename = match ? match[1] : fallbackFilename;
 
   const url = URL.createObjectURL(blob);

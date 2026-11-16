@@ -23,6 +23,10 @@
   - `TargetsReportsModule.tsx` — Salesman targets, commission leaderboard, live GSTR-1 register, 10+ `.xlsx` Excel downloads.
   - `SettingsSuperAdminModule.tsx` — Encrypted integration vault (Firebase, Meta WhatsApp, AI, DB, Deployment, Business/GST/Theme), JSON tenant backup, immutable audit trail, Super Admin tenant provisioning & isolation switcher.
 - **Phase 6**: Python FastAPI + PostgreSQL RLS blueprint (`/backend/`), full documentation (`/docs/`), and verification suite (`scripts/verify_erp.ts`).
+- **Phase 7 (Vercel + Render Production Integration Fix)**:
+  - Upgraded `/backend/` (`main.py`, `db.py`, `security.py`, `excel_export.py`, `ai_service.py`, `requirements.txt`) to full FastAPI ERP parity with `server.ts` — including `/` and `/health` probes, outermost CORS middleware, SQLite WAL schema & demo seed, JWT (`ERP_JWT_SECRET`), bcrypt, AES-256-GCM vault (`ERP_VAULT_KEY`), RBAC, tenant isolation, POS/Inventory/Staff/Accounts/CRM/WhatsApp/AI/Reports/Settings APIs, plus preserved `/api/v1/*` endpoints.
+  - Updated `src/lib/api.ts` with `VITE_API_BASE_URL` resolution, automatic `.vercel.app` -> `https://titangrid-backend.onrender.com` fallback, and FastAPI `detail` + `error` parsing, while preserving same-origin Express `/api/*` for local dev.
+  - Added `vercel.json` with `/api/(.*)` rewrite to Render and SPA fallback to `/index.html`.
 
 ## Status
-All planned MVP & Enterprise ERP modules are implemented, compiled, linted, and verified.
+All planned MVP & Enterprise ERP modules are implemented, compiled, linted, and verified for both local Node/Express preview and Vercel + Render production deployment.

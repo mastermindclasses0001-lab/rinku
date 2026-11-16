@@ -39,7 +39,8 @@
 - [x] Admin Settings & Configuration Center
 
 ## Phase 6: Blueprint, Docs & Verification
-- [x] `/backend/` Python FastAPI service (`main.py`, `postgres_schema.sql`, `requirements.txt`, `Dockerfile`)
+- [x] `/backend/` Python FastAPI full ERP API parity (`main.py`, `db.py`, `security.py`, `excel_export.py`, `ai_service.py`, `postgres_schema.sql`, `requirements.txt`, `Dockerfile`)
+- [x] `vercel.json` & `src/lib/api.ts` production API base URL routing (`VITE_API_BASE_URL` + Render fallback)
 - [x] `docs/DEPLOYMENT.md`, `docs/API_DOCS.md`, `docs/ADMIN_MANUAL.md`, `docs/BACKUP_RESTORE.md`
 - [x] Automated verification suite (`scripts/verify_erp.ts`)
-- [x] Final TypeScript lint (`tsc --noEmit`), build (`vite build`), and live server check
+- [x] Final TypeScript lint (`tsc --noEmit`), build (`vite build`), Python compile check, and live server check
