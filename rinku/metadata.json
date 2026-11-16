@@ -1,0 +1,6 @@
+{
+  "name": "TitanGrid Retail ERP",
+  "description": "Multi-tenant white-label Retail ERP for Tiles, Paint, Sanitaryware, and Hardware businesses with POS GST billing, branch inventory, face attendance, accounting, WhatsApp automation, and AI Brain.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
